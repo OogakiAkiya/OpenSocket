@@ -1,6 +1,6 @@
-#ifndef Include_h
+ï»¿#ifndef Include_h
 #define Include_h
-//ƒŠƒ“ƒN‚Ì’Ç‰Á:->ƒvƒƒpƒeƒB[->ƒŠƒ“ƒJ[->“ü—Í->ws2_32.lib
+//ãƒªãƒ³ã‚¯ã®è¿½åŠ :->ãƒ—ãƒ­ãƒ‘ãƒ†ã‚£ãƒ¼->ãƒªãƒ³ã‚«ãƒ¼->å…¥åŠ›->ws2_32.lib
 
 #include<stdio.h>
 #include<iostream>

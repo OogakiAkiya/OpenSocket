@@ -1,21 +1,21 @@
-#pragma once
+ï»¿#pragma once
 
 class BaseClient {
 public:
 	virtual ~BaseClient() { m_socket->Close(); }
 	virtual void Update() {};
-	virtual int GetRecvDataSize() { return 0; }											//ƒT[ƒo[‚©‚çóM‚µ‚½ƒf[ƒ^‚ª‚¢‚­‚Â‚ ‚é‚©
-	virtual std::vector<char> GetRecvData() = 0;										//ƒT[ƒo[‚©‚çóM‚µ‚½ƒf[ƒ^‚ğæ‚èo‚·
-	virtual int SendServer(char* _buf, int _bufSize) { return 0; }						//“Á’è‚ÌƒT[ƒo[‚É‘—M‚·‚éê‡g—p‚·‚é
+	virtual int GetRecvDataSize() { return 0; }											//ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ãŒã„ãã¤ã‚ã‚‹ã‹
+	virtual std::vector<char> GetRecvData() = 0;										//ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å–ã‚Šå‡ºã™
+	virtual int SendServer(char* _buf, int _bufSize) { return 0; }						//ç‰¹å®šã®ã‚µãƒ¼ãƒãƒ¼ã«é€ä¿¡ã™ã‚‹å ´åˆä½¿ç”¨ã™ã‚‹
 
 protected:
 	std::shared_ptr<BaseSocket> m_socket;
 	std::shared_ptr<BaseRoutine> m_routine;
 	static void SwitchIpv(std::shared_ptr<BaseSocket> _socket, int _ipv);
-	std::queue<std::vector<char>> recvDataQueList;										//ƒT[ƒo[‚©‚çóM‚µ‚½î•ñ‚ª“ü‚é
+	std::queue<std::vector<char>> recvDataQueList;										//ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å—ä¿¡ã—ãŸæƒ…å ±ãŒå…¥ã‚‹
 
 	//UDP
-	std::queue<std::pair<sockaddr, std::vector<char>>> U_recvDataQueList;				//ƒNƒ‰ƒCƒAƒ“ƒg‚©‚çóM‚µ‚½î•ñ‚ª“ü‚é
+	std::queue<std::pair<sockaddr, std::vector<char>>> U_recvDataQueList;				//ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰å—ä¿¡ã—ãŸæƒ…å ±ãŒå…¥ã‚‹
 
 };
 
@@ -30,9 +30,9 @@ public:
 	~TCP_Client() {}
 	virtual void Update() override;
 	static std::shared_ptr<BaseClient> GetInstance(const std::string _addrs, const std::string _port,const int _ipv, const bool _asynchronous = false);
-	virtual int GetRecvDataSize()override { return recvDataQueList.size(); }			//ƒT[ƒo[‚©‚çóM‚µ‚½ƒf[ƒ^‚ª‚¢‚­‚Â‚ ‚é‚©
-	virtual std::vector<char> GetRecvData()override;									//ƒT[ƒo[‚©‚çóM‚µ‚½ƒf[ƒ^‚ğæ‚èo‚·
-	virtual int SendServer(char* _buf, int _bufSize)override;							//“Á’è‚ÌƒT[ƒo[‚É‘—M‚·‚éê‡g—p‚·‚é
+	virtual int GetRecvDataSize()override { return recvDataQueList.size(); }			//ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ãŒã„ãã¤ã‚ã‚‹ã‹
+	virtual std::vector<char> GetRecvData()override;									//ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å–ã‚Šå‡ºã™
+	virtual int SendServer(char* _buf, int _bufSize)override;							//ç‰¹å®šã®ã‚µãƒ¼ãƒãƒ¼ã«é€ä¿¡ã™ã‚‹å ´åˆä½¿ç”¨ã™ã‚‹
 
 private:
 	std::vector<char> recvData;
@@ -45,10 +45,10 @@ public:
 	virtual void Update() override;
 	static std::shared_ptr<BaseClient> GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous = false);
 
-	virtual int GetRecvDataSize()override { return U_recvDataQueList.size(); }			//ƒT[ƒo[‚©‚çóM‚µ‚½ƒf[ƒ^‚ª‚¢‚­‚Â‚ ‚é‚©
-	virtual std::vector<char> GetRecvData()override;									//ƒT[ƒo[‚©‚çóM‚µ‚½ƒf[ƒ^‚ğæ‚èo‚·
-	virtual int SendServer(char* _buf, int _bufSize)override;							//“Á’è‚ÌƒT[ƒo[‚É‘—M‚·‚éê‡g—p‚·‚é
+	virtual int GetRecvDataSize()override { return U_recvDataQueList.size(); }			//ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ãŒã„ãã¤ã‚ã‚‹ã‹
+	virtual std::vector<char> GetRecvData()override;									//ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å–ã‚Šå‡ºã™
+	virtual int SendServer(char* _buf, int _bufSize)override;							//ç‰¹å®šã®ã‚µãƒ¼ãƒãƒ¼ã«é€ä¿¡ã™ã‚‹å ´åˆä½¿ç”¨ã™ã‚‹
 
 private:
-	unsigned int sequence = 0;															//ƒV[ƒPƒ“ƒX”Ô†
+	unsigned int sequence = 0;															//ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ç•ªå·
 };

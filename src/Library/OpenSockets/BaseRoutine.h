@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 class BaseSocket;
 
 class BaseRoutine {
@@ -12,12 +12,12 @@ private:
 
 class TCP_Routine:public BaseRoutine {
 public:
-	//TCP_Client�Ŏg�p
+	//TCP_Clientで使用
 	virtual void Update(std::shared_ptr<BaseSocket> _socket, 
 						std::vector<char>& _recvData, 
 						std::queue<std::vector<char>>& _recvDataQueList
 						)override;
-	//TCP_Server�Ŏg�p
+	//TCP_Serverで使用
 	virtual void Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList,
 						std::unordered_map<SOCKET, std::vector<char>>& _recvDataMap, 
 						std::queue<std::pair<SOCKET, std::vector<char>>>& _recvDataQueList
@@ -28,7 +28,7 @@ private:
 
 class UDP_Routine :public BaseRoutine {
 public:
-	//UDP_Server�Ŏg�p
+	//UDP_Serverで使用
 	virtual void Update(std::shared_ptr<BaseSocket> _socket,std::queue<std::pair<sockaddr, std::vector<char>>>& _recvDataQueList) override ;
 private:
 

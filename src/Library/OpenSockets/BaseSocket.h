@@ -1,34 +1,34 @@
-#pragma once
+ï»¿#pragma once
 
 #define IPV4 1
 #define IPV6 2
 #define IPVD 3
 #define SEQUENCEMAX 4200000000
 
-//ƒoƒbƒtƒ@ƒTƒCƒY‚Í1Mbyte
+//ãƒãƒƒãƒ•ã‚¡ã‚µã‚¤ã‚ºã¯1Mbyte
 //#define TCP_BUFFERSIZE 1048576
 #define TCP_BUFFERSIZE 2048
 
 class BaseSocket {
 public:
-	//İ’è
+	//è¨­å®š
 	void Init(const std::string _addrs, const std::string _port);
 	void SetProtocolVersion_IPv4();							//IPv4
 	void SetProtocolVersion_IPv6();							//IPv6
-	void SetProtocolVersion_Dual();							//IPv4‚ÆIPv6‚Ì—¼•û‚Æ’ÊM‰Â”\(ƒNƒ‰ƒCƒAƒ“ƒg‚Å‚Ì‚İg—p‰Â”\)
+	void SetProtocolVersion_Dual();							//IPv4ã¨IPv6ã®ä¸¡æ–¹ã¨é€šä¿¡å¯èƒ½(ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã§ã®ã¿ä½¿ç”¨å¯èƒ½)
 	void SetProtocol_TCP();									//TCP
 	void SetProtocol_UDP();									//UDP
-	void SetAsynchronous();									//”ñ“¯Šú
-	bool AddressSet();										//socketˆ—
+	void SetAsynchronous();									//éåŒæœŸ
+	bool AddressSet();										//socketå‡¦ç†
 	void Close();
 
 	//recv,send
-	int Recv(char* _recvbuf, int recvbuf_size, int flg = 0);									//ƒf[ƒ^óM(TCP)
-	int Recvfrom(sockaddr* _senderAddr,char* _recvbuf, int recvbuf_size, int flg = 0);			//ƒf[ƒ^óM(UDP)
-	int Send(char* _sendData, const int _sendDataSize);											//ƒf[ƒ^‘—M(TCP)
-	int Send(SOCKET _socket,char* _sendData, const int _sendDataSize);							//ƒf[ƒ^‘—M(TCP)
-	int Sendto(char* _sendData, const int _sendDataSize);										//ƒf[ƒ^‘—M(UDP)
-	int Sendto(sockaddr* _addr,char* _sendData, const int _sendDataSize);						//ƒf[ƒ^‘—M(UDP)
+	int Recv(char* _recvbuf, int recvbuf_size, int flg = 0);									//ãƒ‡ãƒ¼ã‚¿å—ä¿¡(TCP)
+	int Recvfrom(sockaddr* _senderAddr,char* _recvbuf, int recvbuf_size, int flg = 0);			//ãƒ‡ãƒ¼ã‚¿å—ä¿¡(UDP)
+	int Send(char* _sendData, const int _sendDataSize);											//ãƒ‡ãƒ¼ã‚¿é€ä¿¡(TCP)
+	int Send(SOCKET _socket,char* _sendData, const int _sendDataSize);							//ãƒ‡ãƒ¼ã‚¿é€ä¿¡(TCP)
+	int Sendto(char* _sendData, const int _sendDataSize);										//ãƒ‡ãƒ¼ã‚¿é€ä¿¡(UDP)
+	int Sendto(sockaddr* _addr,char* _sendData, const int _sendDataSize);						//ãƒ‡ãƒ¼ã‚¿é€ä¿¡(UDP)
 
 	//get,set
 	SOCKET GetSocket() { return m_socket; }
@@ -46,9 +46,9 @@ protected:
 	//==================================================
 	//Winsock2.0 variable
 	//==================================================
-	std::string ip = "";									//IPƒAƒhƒŒƒX
-	std::string port = "";									//ƒ|[ƒg”Ô†
-	SOCKET m_socket;										//ƒ\ƒPƒbƒg
+	std::string ip = "";									//IPã‚¢ãƒ‰ãƒ¬ã‚¹
+	std::string port = "";									//ãƒãƒ¼ãƒˆç•ªå·
+	SOCKET m_socket;										//ã‚½ã‚±ãƒƒãƒˆ
 	bool is_available = false;
 	struct addrinfo *result = NULL, hints;	
 };

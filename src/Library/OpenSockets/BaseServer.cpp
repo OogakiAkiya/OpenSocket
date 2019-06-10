@@ -1,4 +1,4 @@
-#include"../../include.h"
+ï»¿#include"../../include.h"
 
 #include"BaseSocket.h"
 #include"BaseRoutine.h"
@@ -72,7 +72,7 @@ int TCP_Server::SendOnlyClient(SOCKET _socket, char * _buf, int _bufSize)
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
 
-	//ƒwƒbƒ_[‚ð•t‰Á‚µ‘—M
+	//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ ã—é€ä¿¡
 	memcpy(sendBuf, &_bufSize, sizeof(int));
 	memcpy(&sendBuf[sizeof(int)], _buf, _bufSize);
 
@@ -87,7 +87,7 @@ int TCP_Server::SendAllClient(char * _buf, int _bufSize)
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
 
-	//ƒwƒbƒ_[‚ð•t‰Á‚µ‘—M
+	//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ ã—é€ä¿¡
 	memcpy(sendBuf, &_bufSize, sizeof(int));
 	memcpy(&sendBuf[sizeof(int)], _buf, _bufSize);
 
@@ -131,14 +131,14 @@ int UDP_Server::SendOnlyClient(sockaddr * _addr, char * _buf, int _bufSize)
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
 
-	//ƒwƒbƒ_[‚ð•t‰Á‚µ‘—M
+	//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ ã—é€ä¿¡
 	memcpy(sendBuf, &sequence, sizeof(unsigned int));
 	memcpy(&sendBuf[sizeof(unsigned int)], _buf, _bufSize);
 
-	//‘—Mˆ—
+	//é€ä¿¡å‡¦ç†
 	int len = m_socket->Sendto(_addr, &sendBuf[0], _bufSize+sizeof(unsigned int));
 
-	//ƒV[ƒPƒ“ƒX”Ô†ŠÇ—
+	//ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ç•ªå·ç®¡ç†
 	sequence++;
 	if (sequence > SEQUENCEMAX) { sequence = 0; }
 
@@ -151,16 +151,16 @@ int UDP_Server::SendMultiClient(std::vector<sockaddr> _addrList, char * _buf, in
 	char sendBuf[TCP_BUFFERSIZE];
 	int len = 0;
 
-	//ƒwƒbƒ_[‚ð•t‰Á‚µ‘—M
+	//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ ã—é€ä¿¡
 	memcpy(sendBuf, &sequence, sizeof(unsigned int));
 	memcpy(&sendBuf[sizeof(unsigned int)], _buf, _bufSize);
 
 	for (auto&& addr : _addrList) {
-		//‘—Mˆ—
+		//é€ä¿¡å‡¦ç†
 		len = m_socket->Sendto(&addr, &sendBuf[0], _bufSize + sizeof(unsigned int));
 	}
 
-	//ƒV[ƒPƒ“ƒX”Ô†ŠÇ—
+	//ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ç•ªå·ç®¡ç†
 	sequence++;
 	if (sequence > SEQUENCEMAX) { sequence = 0; }
 

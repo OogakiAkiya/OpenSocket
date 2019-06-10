@@ -1,4 +1,4 @@
-#include"include.h"
+ï»¿#include"include.h"
 
 #include"Library/OpenSockets/BaseSocket.h"
 #include"Library/OpenSockets/BaseRoutine.h"
@@ -9,7 +9,7 @@ using namespace std;
 
 int main() {
 	//=============================================================
-	//TCPƒTƒ“ƒvƒ‹
+	//TCPã‚µãƒ³ãƒ—ãƒ«
 	//=============================================================
 	//TCP_Server
 	/*
@@ -17,7 +17,7 @@ int main() {
 	while (1) {
 		server->Update();
 
-		//ƒf[ƒ^‘—Mˆ—
+		//ãƒ‡ãƒ¼ã‚¿é€ä¿¡å‡¦ç†
 		while (server->GetRecvDataSize()>0) {
 			auto recvData = server->TCP_GetRecvData();
 			int sendDataSize = server->SendOnlyClient(recvData.first, &recvData.second[0], recvData.second.size());
@@ -38,14 +38,14 @@ int main() {
 		}
 	}
 
-	//‘—Mˆ—(‰¼)
+	//é€ä¿¡å‡¦ç†(ä»®)
 	char tem[6] = "HELLO";
 	int dataSize=client->SendServer(tem, sizeof(tem));
 	printf("SendData=%d\n", dataSize);
 	while (client->GetRecvDataSize() == 0) {
 		client->Update();
 	}
-	//óMˆ—
+	//å—ä¿¡å‡¦ç†
 	std::vector<char> temp=client->GetRecvData();
 	char buf[100];
 	memcpy(buf, &temp[0], temp.size());
@@ -54,7 +54,7 @@ int main() {
 
 
 	//=============================================================
-	//UDPƒTƒ“ƒvƒ‹
+	//UDPã‚µãƒ³ãƒ—ãƒ«
 	//=============================================================
 	//Server
 	/*

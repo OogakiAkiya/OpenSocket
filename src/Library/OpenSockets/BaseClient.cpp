@@ -1,4 +1,4 @@
-#include"../../include.h"
+ï»¿#include"../../include.h"
 #include"BaseSocket.h"
 #include"BaseRoutine.h"
 #include"BaseClient.h"
@@ -27,11 +27,11 @@ std::shared_ptr<BaseClient> TCP_Client::GetInstance(const std::string _addrs, co
 	temp->m_socket = std::make_shared<BaseSocket>();
 	temp->m_routine = std::make_shared<TCP_Routine>();
 
-	temp->m_socket->Init(_addrs, _port);						//IPƒAƒhƒŒƒX‚Æƒ|[ƒg”Ô†‚Ìİ’è
-	SwitchIpv(temp->m_socket, _ipv);							//IPv‚Ìİ’è
-	temp->m_socket->SetProtocol_TCP();							//TCP’ÊM‚Éİ’è
-	if (!temp->m_socket->AddressSet())return nullptr;			//ƒ\ƒPƒbƒg¶¬
-	if (!temp->m_socket->Connect())return nullptr;				//ƒRƒlƒNƒgˆ—
+	temp->m_socket->Init(_addrs, _port);						//IPã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ãƒãƒ¼ãƒˆç•ªå·ã®è¨­å®š
+	SwitchIpv(temp->m_socket, _ipv);							//IPvã®è¨­å®š
+	temp->m_socket->SetProtocol_TCP();							//TCPé€šä¿¡ã«è¨­å®š
+	if (!temp->m_socket->AddressSet())return nullptr;			//ã‚½ã‚±ãƒƒãƒˆç”Ÿæˆ
+	if (!temp->m_socket->Connect())return nullptr;				//ã‚³ãƒã‚¯ãƒˆå‡¦ç†
 	if (_asynchronous)temp->m_socket->SetAsynchronous();
 
 	return temp;
@@ -50,7 +50,7 @@ int TCP_Client::SendServer(char * _buf, int _bufSize)
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
 
-	//ƒwƒbƒ_[‚ğ•t‰Á‚µ‘—M
+	//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ ã—é€ä¿¡
 	memcpy(sendBuf, &_bufSize, sizeof(int));
 	memcpy(&sendBuf[sizeof(int)], _buf, _bufSize);
 
@@ -73,10 +73,10 @@ std::shared_ptr<BaseClient> UDP_Client::GetInstance(const std::string _addrs, co
 	temp->m_socket = std::make_shared<BaseSocket>();
 	temp->m_routine = std::make_shared<UDP_Routine>();
 
-	temp->m_socket->Init(_addrs, _port);						//IPƒAƒhƒŒƒX‚Æƒ|[ƒg”Ô†‚Ìİ’è
-	SwitchIpv(temp->m_socket, _ipv);							//IPv‚Ìİ’è
-	temp->m_socket->SetProtocol_UDP();							//TCP’ÊM‚Éİ’è
-	if (!temp->m_socket->AddressSet())return nullptr;			//ƒ\ƒPƒbƒg¶¬
+	temp->m_socket->Init(_addrs, _port);						//IPã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ãƒãƒ¼ãƒˆç•ªå·ã®è¨­å®š
+	SwitchIpv(temp->m_socket, _ipv);							//IPvã®è¨­å®š
+	temp->m_socket->SetProtocol_UDP();							//TCPé€šä¿¡ã«è¨­å®š
+	if (!temp->m_socket->AddressSet())return nullptr;			//ã‚½ã‚±ãƒƒãƒˆç”Ÿæˆ
 	if (_asynchronous)temp->m_socket->SetAsynchronous();
 	return temp;
 }
@@ -94,14 +94,14 @@ int UDP_Client::SendServer(char * _buf, int _bufSize)
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
 
-	//ƒwƒbƒ_[‚ğ•t‰Á‚µ‘—M
+	//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ ã—é€ä¿¡
 	memcpy(&sendBuf[0], &sequence, sizeof(unsigned int));
 	memcpy(&sendBuf[sizeof(unsigned int)], &_buf[0], _bufSize);
 	
-	//‘—Mˆ—
+	//é€ä¿¡å‡¦ç†
 	int len = m_socket->Sendto(&sendBuf[0], _bufSize+sizeof(unsigned int));
 
-	//ƒV[ƒPƒ“ƒX”Ô†ŠÇ—
+	//ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ç•ªå·ç®¡ç†
 	sequence++;
 	if (sequence > SEQUENCEMAX) { sequence = 0; }
 

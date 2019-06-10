@@ -1,4 +1,4 @@
-#include"../../include.h"
+ï»¿#include"../../include.h"
 #include"BaseSocket.h"
 
 #pragma comment(lib,"ws2_32.lib")
@@ -41,7 +41,7 @@ void BaseSocket::SetProtocol_UDP()
 void BaseSocket::SetAsynchronous()
 {
 	unsigned long value = 1;
-	ioctlsocket(m_socket, FIONBIO, &value);					//”ñ“¯Šú’ÊM‰»
+	ioctlsocket(m_socket, FIONBIO, &value);					//éåŒæœŸé€šä¿¡åŒ–
 
 }
 
@@ -49,7 +49,7 @@ void BaseSocket::SetAsynchronous()
 bool BaseSocket::AddressSet()
 {
 	WSADATA wsaData;
-	//socketg—p‰Â”\‚©‚Ìƒ`ƒFƒbƒN
+	//socketä½¿ç”¨å¯èƒ½ã‹ã®ãƒã‚§ãƒƒã‚¯
 	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	if (iResult != 0) {
 		is_available = true;
@@ -66,13 +66,13 @@ bool BaseSocket::AddressSet()
 		return false;
 	}
 
-	//ƒ\ƒPƒbƒg‚Ìì¬
+	//ã‚½ã‚±ãƒƒãƒˆã®ä½œæˆ
 	m_socket = INVALID_SOCKET;
 	m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	if (m_socket == INVALID_SOCKET) {
 		printf("Error at socket():%ld\n", WSAGetLastError());
-		freeaddrinfo(result);							//ƒƒ‚ƒŠ‚Ì‰ğ•ú
-		WSACleanup();									//ƒ\ƒPƒbƒg‚Ì‰ğ•ú
+		freeaddrinfo(result);							//ãƒ¡ãƒ¢ãƒªã®è§£æ”¾
+		WSACleanup();									//ã‚½ã‚±ãƒƒãƒˆã®è§£æ”¾
 		is_available = true;
 		return false;
 	}
@@ -83,7 +83,7 @@ bool BaseSocket::AddressSet()
 
 void BaseSocket::Close()
 {
-	int iResult = shutdown(m_socket, SD_SEND);			//¡‘—‚Á‚Ä‚¢‚éî•ñ‚ğ‘—‚è‚«‚Á‚ÄI‚í‚é
+	int iResult = shutdown(m_socket, SD_SEND);			//ä»Šé€ã£ã¦ã„ã‚‹æƒ…å ±ã‚’é€ã‚Šãã£ã¦çµ‚ã‚ã‚‹
 	if (iResult == SOCKET_ERROR) {
 		closesocket(m_socket);
 		WSACleanup();
@@ -139,12 +139,12 @@ int BaseSocket::Sendto(sockaddr * _addr, char * _sendData, const int _sendDataSi
 bool BaseSocket::Bind()
 {
 	//bind
-	int iResult = ::bind(m_socket, result->ai_addr, (int)result->ai_addrlen);				//IPƒAƒhƒŒƒX(ƒ[ƒJƒ‹ƒAƒhƒŒƒX‚ª“ü‚é)‚Æƒ|[ƒg‚Ìw’è
+	int iResult = ::bind(m_socket, result->ai_addr, (int)result->ai_addrlen);				//IPã‚¢ãƒ‰ãƒ¬ã‚¹(ãƒ­ãƒ¼ã‚«ãƒ«ã‚¢ãƒ‰ãƒ¬ã‚¹ãŒå…¥ã‚‹)ã¨ãƒãƒ¼ãƒˆã®æŒ‡å®š
 	if (iResult == SOCKET_ERROR) {
 		printf("bind failed with error: %d\n", WSAGetLastError());
-		freeaddrinfo(result);																//ƒƒ‚ƒŠ‚Ì‰ğ•ú
-		closesocket(m_socket);																//ƒ\ƒPƒbƒg‚ÌƒNƒ[ƒY
-		WSACleanup();																		//ƒ\ƒPƒbƒg‚Ì‰ğ•ú
+		freeaddrinfo(result);																//ãƒ¡ãƒ¢ãƒªã®è§£æ”¾
+		closesocket(m_socket);																//ã‚½ã‚±ãƒƒãƒˆã®ã‚¯ãƒ­ãƒ¼ã‚º
+		WSACleanup();																		//ã‚½ã‚±ãƒƒãƒˆã®è§£æ”¾
 		return false;
 	}
 	return true;
@@ -154,7 +154,7 @@ bool BaseSocket::Bind()
 bool BaseSocket::Listen()
 {
 	//listen
-	if (listen(m_socket, SOMAXCONN) == SOCKET_ERROR) {										//ƒoƒbƒNƒƒO‚ÌƒTƒCƒY‚ğİ’è
+	if (listen(m_socket, SOMAXCONN) == SOCKET_ERROR) {										//ãƒãƒƒã‚¯ãƒ­ã‚°ã®ã‚µã‚¤ã‚ºã‚’è¨­å®š
 		printf("Listen failed with error:%ld\n", WSAGetLastError());
 		closesocket(m_socket);
 		WSACleanup();
@@ -167,21 +167,21 @@ std::shared_ptr<BaseSocket> BaseSocket::Accept()
 {
 	std::shared_ptr<BaseSocket> client = std::make_shared<BaseSocket>();
 
-	//acceptˆ—
+	//acceptå‡¦ç†
 	SOCKET recvSocket;
 	recvSocket=accept(m_socket, NULL, NULL);
 	if (recvSocket == INVALID_SOCKET) {
 		return nullptr;
 	}
 
-	printf("Ú‘±‚ ‚è\n");
+	printf("æ¥ç¶šã‚ã‚Š\n");
 	client->SetSocket(recvSocket);
 	return client;
 }
 
 bool BaseSocket::Connect()
 {
-	//Ú‘±
+	//æ¥ç¶š
 	int iResult = connect(m_socket, result->ai_addr, (int)result->ai_addrlen);
 	if (iResult == SOCKET_ERROR) {
 		closesocket(m_socket);
