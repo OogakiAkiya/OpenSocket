@@ -44,7 +44,7 @@ void TCP_Routine::Update(std::shared_ptr<BaseSocket> _socket, std::vector<char>&
 	}
 }
 
-void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, std::unordered_map<SOCKET, std::vector<char>>& _recvDataMap, std::queue<std::pair<SOCKET, std::vector<char>>>& _recvDataQueList)
+void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, std::unordered_map<int, std::vector<char>>& _recvDataMap, std::queue<std::pair<int, std::vector<char>>>& _recvDataQueList)
 {
 	std::list<int> deleteList;
 

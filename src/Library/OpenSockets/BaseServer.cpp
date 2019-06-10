@@ -8,9 +8,9 @@
 //Class BaseServer
 //===============================================================
 
-std::pair<SOCKET, std::vector<char>> BaseServer::TCP_GetRecvData()
+std::pair<int, std::vector<char>> BaseServer::TCP_GetRecvData()
 {
-	std::pair<SOCKET, std::vector<char>> returnData;
+	std::pair<int, std::vector<char>> returnData;
 	returnData = recvDataQueList.front();
 	recvDataQueList.pop();
 	return returnData;
@@ -67,7 +67,7 @@ int TCP_Server::GetRecvDataSize()
 	return recvDataQueList.size();
 }
 
-int TCP_Server::SendOnlyClient(SOCKET _socket, char * _buf, int _bufSize)
+int TCP_Server::SendOnlyClient(int _socket, char * _buf, int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];

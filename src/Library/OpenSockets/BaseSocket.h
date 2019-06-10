@@ -26,13 +26,13 @@ public:
 	int Recv(char* _recvbuf, int recvbuf_size, int flg = 0);									//データ受信(TCP)
 	int Recvfrom(sockaddr* _senderAddr,char* _recvbuf, int recvbuf_size, int flg = 0);			//データ受信(UDP)
 	int Send(char* _sendData, const int _sendDataSize);											//データ送信(TCP)
-	int Send(SOCKET _socket,char* _sendData, const int _sendDataSize);							//データ送信(TCP)
+	int Send(int _socket,char* _sendData, const int _sendDataSize);							//データ送信(TCP)
 	int Sendto(char* _sendData, const int _sendDataSize);										//データ送信(UDP)
 	int Sendto(sockaddr* _addr,char* _sendData, const int _sendDataSize);						//データ送信(UDP)
 
 	//get,set
-	SOCKET GetSocket() { return m_socket; }
-	void SetSocket(SOCKET _socket) { m_socket = _socket; }
+	int GetSocket() { return m_socket; }
+	void SetSocket(int _socket) { m_socket = _socket; }
 
 	//server
 	bool Bind();

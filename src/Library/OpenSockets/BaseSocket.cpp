@@ -118,7 +118,7 @@ int BaseSocket::Send(char * _sendData, const int _sendDataSize)
 	
 }
 
-int BaseSocket::Send(SOCKET _socket, char * _sendData, const int _sendDataSize)
+int BaseSocket::Send(int _socket, char * _sendData, const int _sendDataSize)
 {
 	int result = send(_socket, _sendData, _sendDataSize, 0);
 	return result;

@@ -4,7 +4,7 @@ class BaseSocket;
 class BaseRoutine {
 public:
 	virtual void Update(std::shared_ptr<BaseSocket> _socket,std::vector<char>& _recvData, std::queue<std::vector<char>>& _recvDataQueList) {}
-	virtual void Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, std::unordered_map<SOCKET, std::vector<char>>& _recvDataMap, std::queue<std::pair<SOCKET, std::vector<char>>>& _recvDataQueList) {}
+	virtual void Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, std::unordered_map<int, std::vector<char>>& _recvDataMap, std::queue<std::pair<int, std::vector<char>>>& _recvDataQueList) {}
 	virtual void Update(std::shared_ptr<BaseSocket> _socket,std::queue<std::pair<sockaddr, std::vector<char>>>& _recvDataQueList) {};
 
 private:
@@ -19,8 +19,8 @@ public:
 						)override;
 	//TCP_Serverで使用
 	virtual void Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList,
-						std::unordered_map<SOCKET, std::vector<char>>& _recvDataMap, 
-						std::queue<std::pair<SOCKET, std::vector<char>>>& _recvDataQueList
+						std::unordered_map<int, std::vector<char>>& _recvDataMap, 
+						std::queue<std::pair<int, std::vector<char>>>& _recvDataQueList
 						) override;
 private:
 

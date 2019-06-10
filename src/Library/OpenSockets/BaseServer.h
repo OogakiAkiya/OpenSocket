@@ -5,13 +5,13 @@ public:
 	virtual ~BaseServer() { m_socket->Close(); }
 	virtual void Update() {};
 	virtual int GetRecvDataSize() = 0;																		//クライアントから受信したデータがいくつあるか
-	virtual int SendOnlyClient(SOCKET _socket, char* _buf, int _bufSize) { return 0; }						//特定のクライアントに送信する場合使用する(TCP)
+	virtual int SendOnlyClient(int _socket, char* _buf, int _bufSize) { return 0; }						//特定のクライアントに送信する場合使用する(TCP)
 	virtual int SendOnlyClient(sockaddr* _addr, char* _buf, int _bufSize) { return 0; }						//特定のクライアントに送信する場合使用する(UDP)
 	virtual int SendMultiClient(std::vector<sockaddr> _addrList, char* _buf, int _bufSize) { return 0; }	//特定の複数クライアントに送信する場合使用する(UDP)
 	virtual int SendAllClient(char* _buf, int _bufSize) { return 0; }										//全てのクライアントに送信する場合使用する(TCP)
 
 	//TCP専用
-	std::pair<SOCKET, std::vector<char>> TCP_GetRecvData();													//クライアントから受信したデータを取り出す
+	std::pair<int, std::vector<char>> TCP_GetRecvData();													//クライアントから受信したデータを取り出す
 	
 	//UDP専用
 	std::pair<sockaddr, std::vector<char>> UDP_GetRecvData();												//クライアントから受信したデータを取り出す
@@ -22,7 +22,7 @@ protected:
 	static void SwitchIpv(std::shared_ptr<BaseSocket> _socket, int _ipv);									//IPvの設定
 
 	//TCP専用
-	std::queue<std::pair<SOCKET, std::vector<char>>> recvDataQueList;										//クライアントから受信した情報が入る
+	std::queue<std::pair<int, std::vector<char>>> recvDataQueList;										//クライアントから受信した情報が入る
 
 	//UDP専用
 	std::queue<std::pair<sockaddr, std::vector<char>>> U_recvDataQueList;									//クライアントから受信した情報が入る
@@ -42,11 +42,11 @@ public:
 	virtual void Update() override;
 	virtual int GetRecvDataSize() override;
 
-	virtual int SendOnlyClient(SOCKET _socket, char* _buf, int _bufSize)override;							//特定のクライアントに送信する場合使用する
+	virtual int SendOnlyClient(int _socket, char* _buf, int _bufSize)override;							//特定のクライアントに送信する場合使用する
 	virtual int SendAllClient(char* _buf, int _bufSize)override;											//全てのクライアントに送信する場合使用する
 
 private:
-	std::unordered_map<SOCKET, std::vector<char>> recvDataMap;												//各クライアントごとのrecvData
+	std::unordered_map<int, std::vector<char>> recvDataMap;												//各クライアントごとのrecvData
 	std::vector<std::shared_ptr<BaseSocket>> clientList;													//クライアントのソケット情報を管理
 
 };
