@@ -1,7 +1,7 @@
 ﻿#ifndef Include_h
 #define Include_h
-//リンクの追加:->プロパティー->リンカー->入力->ws2_32.lib
 
+#ifdef _MSC_VER
 #include<stdio.h>
 #include<iostream>
 #include<sstream>
@@ -18,5 +18,31 @@
 #include<thread>
 #include<queue>
 #include <unordered_map>
+
+#endif
+#ifdef __GNUC__
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <memory>
+#include <string>
+#include <vector>
+#include <unordered_map>
+#include <queue>
+#include <list>
+#include <cstring>
+#include <sys/ioctl.h>
+#include <fstream>
+#include "BaseSocket.h"
+#include "BaseRoutine.h"
+#include "BaseClient.h"
+#include "BaseServer.h"
+
+#endif
+
+
 
 #endif

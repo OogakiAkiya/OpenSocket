@@ -5,14 +5,12 @@
 #include"Library/OpenSockets/BaseServer.h"
 #include"Library/OpenSockets/BaseClient.h"
 
-using namespace std;
-
 int main() {
 	//=============================================================
 	//TCPサンプル
 	//=============================================================
 	//TCP_Server
-	/*
+	
 	auto server = TCP_Server::GetInstance("0.0.0.0", "12345", IPV4,true);
 	while (1) {
 		server->Update();
@@ -23,11 +21,11 @@ int main() {
 			int sendDataSize = server->SendOnlyClient(recvData.first, &recvData.second[0], recvData.second.size());
 		}
 	}
-	*/
+	
 
 	//TCP_Client
 	/*
-	shared_ptr<BaseClient> client;
+	std::shared_ptr<BaseClient> client;
 	while (1) {
 		client = TCP_Client::GetInstance("127.0.0.1", "12345", IPV4,true);
 		if (client) {
@@ -73,7 +71,7 @@ int main() {
 	*/
 	//Client
 	/*
-	shared_ptr<BaseClient> client;
+	std::shared_ptr<BaseClient> client;
 	client = UDP_Client::GetInstance("127.0.0.1", "12345", IPVD, true);
 	char tem[6] = "HELLO";
 	int len=client->SendServer(&tem[0], sizeof(tem));
