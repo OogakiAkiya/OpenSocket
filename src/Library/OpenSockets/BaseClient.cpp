@@ -46,7 +46,7 @@ std::vector<char> TCP_Client::GetRecvData()
 	return returnData;
 }
 
-int TCP_Client::SendServer(char * _buf, int _bufSize)
+int TCP_Client::SendServer(const char * _buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
@@ -64,7 +64,7 @@ int TCP_Client::SendServer(char * _buf, int _bufSize)
 //===============================================================
 void UDP_Client::Update()
 {
-	m_routine->Update(m_socket, U_recvDataQueList);
+	m_routine->Update(m_socket, recvDataQueList);
 }
 
 std::shared_ptr<BaseClient> UDP_Client::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
@@ -85,12 +85,12 @@ std::shared_ptr<BaseClient> UDP_Client::GetInstance(const std::string _addrs, co
 std::vector<char> UDP_Client::GetRecvData()
 {
 	std::pair<sockaddr, std::vector<char>> returnData;
-	returnData = U_recvDataQueList.front();
-	U_recvDataQueList.pop();
+	returnData = recvDataQueList.front();
+	recvDataQueList.pop();
 	return returnData.second;
 }
 
-int UDP_Client::SendServer(char * _buf, int _bufSize)
+int UDP_Client::SendServer(const char * _buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
@@ -160,7 +160,7 @@ std::vector<char> TCP_Client::GetRecvData()
 	return returnData;
 }
 
-int TCP_Client::SendServer(char *_buf, int _bufSize)
+int TCP_Client::SendServer(const char *_buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
@@ -178,7 +178,7 @@ int TCP_Client::SendServer(char *_buf, int _bufSize)
 //===============================================================
 void UDP_Client::Update()
 {
-	m_routine->Update(m_socket, U_recvDataQueList);
+	m_routine->Update(m_socket, recvDataQueList);
 }
 
 std::shared_ptr<BaseClient> UDP_Client::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
@@ -201,12 +201,12 @@ std::shared_ptr<BaseClient> UDP_Client::GetInstance(const std::string _addrs, co
 std::vector<char> UDP_Client::GetRecvData()
 {
 	std::pair<struct sockaddr_in, std::vector<char>> returnData;
-	returnData = U_recvDataQueList.front();
-	U_recvDataQueList.pop();
+	returnData = recvDataQueList.front();
+	recvDataQueList.pop();
 	return returnData.second;
 }
 
-int UDP_Client::SendServer(char *_buf, int _bufSize)
+int UDP_Client::SendServer(const char *_buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];

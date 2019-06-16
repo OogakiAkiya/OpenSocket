@@ -7,7 +7,7 @@
 //Class TCP_Routine
 //===============================================================
 
-void TCP_Routine::Update(std::shared_ptr<BaseSocket> _socket, std::vector<char>& _recvData, std::queue<std::vector<char>>& _recvDataQueList)
+void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<char>& _recvData, std::queue<std::vector<char>>& _recvDataQueList)
 {
 	char buf[TCP_BUFFERSIZE];
 	int dataSize = _socket->Recv(buf, TCP_BUFFERSIZE);
@@ -110,7 +110,7 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 //===============================================================
 //Class UDP_Routine
 //===============================================================
-void UDP_Routine::Update(std::shared_ptr<BaseSocket> _socket, std::queue<std::pair<sockaddr, std::vector<char>>>& _recvDataQueList)
+void UDP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::queue<std::pair<sockaddr, std::vector<char>>>& _recvDataQueList)
 {
 	std::pair<sockaddr, std::vector<char>> addData;
 	char buf[TCP_BUFFERSIZE];
@@ -133,7 +133,7 @@ void UDP_Routine::Update(std::shared_ptr<BaseSocket> _socket, std::queue<std::pa
 //Class TCP_Routine
 //===============================================================
 
-void TCP_Routine::Update(std::shared_ptr<BaseSocket> _socket, std::vector<char> &_recvData, std::queue<std::vector<char>> &_recvDataQueList)
+void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<char> &_recvData, std::queue<std::vector<char>> &_recvDataQueList)
 {
 	char buf[TCP_BUFFERSIZE];
 	int dataSize = _socket->Recv(buf, TCP_BUFFERSIZE);

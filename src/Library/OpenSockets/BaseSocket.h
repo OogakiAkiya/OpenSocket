@@ -26,12 +26,12 @@ public:
 	void Close();
 
 	//recv,send
-	int Recv(char* _recvbuf, int recvbuf_size, int flg = 0);									//データ受信(TCP)
-	int Recvfrom(sockaddr* _senderAddr, char* _recvbuf, int recvbuf_size, int flg = 0);			//データ受信(UDP)
-	int Send(char* _sendData, const int _sendDataSize);											//データ送信(TCP)
-	int Send(int _socket, char* _sendData, const int _sendDataSize);							//データ送信(TCP)
-	int Sendto(char* _sendData, const int _sendDataSize);										//データ送信(UDP)
-	int Sendto(sockaddr* _addr, char* _sendData, const int _sendDataSize);						//データ送信(UDP)
+	int Recv(char* _recvbuf,int recvbuf_size, const int flg = 0);									//データ受信(TCP)
+	int Recvfrom(sockaddr* _senderAddr, char* _recvbuf, int recvbuf_size,const int flg = 0);			//データ受信(UDP)
+	int Send(const char* _sendData, const int _sendDataSize);											//データ送信(TCP)
+	int Send(const int _socket, const char* _sendData, const int _sendDataSize);							//データ送信(TCP)
+	int Sendto(const char* _sendData, const int _sendDataSize);										//データ送信(UDP)
+	int Sendto(const sockaddr* _addr, const char* _sendData, const int _sendDataSize);						//データ送信(UDP)
 
 	//get,set
 	int GetSocket() { return m_socket; }
@@ -83,12 +83,12 @@ public:
 	//client
 	bool Connect();
 
-	int Recv(char *_recvbuf, int recvbuf_size, int flg = 0);							   //データ受信(TCP)
-	int Recvfrom(sockaddr_in *_senderAddr, char *_recvbuf, int recvbuf_size, int flg = 0); //データ受信(UDP)
-	int Send(char *_sendData, const int _sendDataSize);									   //データ送信(TCP)
-	int Send(int _socket, char *_sendData, const int _sendDataSize);					   //データ送信(TCP)
-	int Sendto(char *_sendData, const int _sendDataSize);								   //データ送信(UDP)
-	int Sendto(sockaddr_in *_addr, char *_sendData, const int _sendDataSize);			   //データ送信(UDP)
+	int Recv(char *_recvbuf, int recvbuf_size, const int flg = 0);							   //データ受信(TCP)
+	int Recvfrom(sockaddr_in *_senderAddr, char *_recvbuf, int recvbuf_size, const int flg = 0); //データ受信(UDP)
+	int Send(const char *_sendData, const int _sendDataSize);									   //データ送信(TCP)
+	int Send(const int _socket, const char *_sendData, const int _sendDataSize);					   //データ送信(TCP)
+	int Sendto(const char *_sendData, const int _sendDataSize);								   //データ送信(UDP)
+	int Sendto(const sockaddr_in *_addr, const char *_sendData, const int _sendDataSize);			   //データ送信(UDP)
 
 private:
 	int m_socket;

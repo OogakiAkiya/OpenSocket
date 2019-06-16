@@ -10,7 +10,7 @@ int main() {
 	//TCPサンプル
 	//=============================================================
 	//TCP_Server
-	
+	/*
 	auto server = TCP_Server::GetInstance("0.0.0.0", "12345", IPV4,true);
 	while (1) {
 		server->Update();
@@ -21,7 +21,7 @@ int main() {
 			int sendDataSize = server->SendOnlyClient(recvData.first, &recvData.second[0], recvData.second.size());
 		}
 	}
-	
+	*/
 
 	//TCP_Client
 	/*

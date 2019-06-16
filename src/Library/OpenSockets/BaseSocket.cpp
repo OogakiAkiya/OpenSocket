@@ -94,7 +94,7 @@ void BaseSocket::Close()
 	WSACleanup();
 }
 
-int BaseSocket::Recv(char * _recvbuf, int recvbuf_size, int flg)
+int BaseSocket::Recv(char * _recvbuf, int recvbuf_size, const int flg)
 {
 	if (this == nullptr)return 0;
 	int bytesize = 0;
@@ -102,7 +102,7 @@ int BaseSocket::Recv(char * _recvbuf, int recvbuf_size, int flg)
 	return bytesize;
 }
 
-int BaseSocket::Recvfrom(sockaddr* _senderAddr, char * _recvbuf, int recvbuf_size, int flg)
+int BaseSocket::Recvfrom(sockaddr* _senderAddr, char * _recvbuf,int recvbuf_size,const int flg)
 {
 	;
 	int bytesize = 0;
@@ -111,7 +111,7 @@ int BaseSocket::Recvfrom(sockaddr* _senderAddr, char * _recvbuf, int recvbuf_siz
 	return bytesize;
 }
 
-int BaseSocket::Send(char * _sendData, const int _sendDataSize)
+int BaseSocket::Send(const char * _sendData, const int _sendDataSize)
 {
 	int result = 0;
 	result = send(m_socket, _sendData, _sendDataSize, 0);
@@ -119,19 +119,19 @@ int BaseSocket::Send(char * _sendData, const int _sendDataSize)
 
 }
 
-int BaseSocket::Send(int _socket, char * _sendData, const int _sendDataSize)
+int BaseSocket::Send(const int _socket, const char * _sendData, const int _sendDataSize)
 {
 	int result = send(_socket, _sendData, _sendDataSize, 0);
 	return result;
 }
 
-int BaseSocket::Sendto(char * _sendData, const int _sendDataSize)
+int BaseSocket::Sendto(const char * _sendData, const int _sendDataSize)
 {
 	int len = sendto(m_socket, _sendData, _sendDataSize, 0, result->ai_addr, result->ai_addrlen);
 	return len;
 }
 
-int BaseSocket::Sendto(sockaddr * _addr, char * _sendData, const int _sendDataSize)
+int BaseSocket::Sendto(const sockaddr * _addr, const char * _sendData, const int _sendDataSize)
 {
 	int len = sendto(m_socket, _sendData, _sendDataSize, 0, _addr, sizeof(sockaddr));
 	return len;
@@ -278,7 +278,7 @@ std::shared_ptr<BaseSocket> BaseSocket::Accept()
 	socklen_t len = sizeof(client);
 	int sock = -1;
 	sock = accept(m_socket, (struct sockaddr *)&client, &len);
-	if (sock == -1)
+	if (sock <0||sock==0)
 	{
 		return nullptr;
 	}
@@ -295,7 +295,7 @@ bool BaseSocket::Connect()
 	}
 	return true;
 }
-int BaseSocket::Recv(char *_recvbuf, int recvbuf_size, int flg)
+int BaseSocket::Recv(char *_recvbuf, int recvbuf_size, const int flg)
 {
 	if (this == nullptr)
 	{
@@ -306,7 +306,7 @@ int BaseSocket::Recv(char *_recvbuf, int recvbuf_size, int flg)
 	return bytesize;
 }
 
-int BaseSocket::Recvfrom(sockaddr_in *_senderAddr, char *_recvbuf, int recvbuf_size, int flg)
+int BaseSocket::Recvfrom(sockaddr_in *_senderAddr, char *_recvbuf, int recvbuf_size, const int flg)
 {
 	;
 	int bytesize = 0;
@@ -315,26 +315,26 @@ int BaseSocket::Recvfrom(sockaddr_in *_senderAddr, char *_recvbuf, int recvbuf_s
 	return bytesize;
 }
 
-int BaseSocket::Send(char *_sendData, const int _sendDataSize)
+int BaseSocket::Send(const char *_sendData, const int _sendDataSize)
 {
 	int result = 0;
 	result = send(m_socket, _sendData, _sendDataSize, 0);
 	return result;
 }
 
-int BaseSocket::Send(int _socket, char *_sendData, const int _sendDataSize)
+int BaseSocket::Send(const int _socket, const char *_sendData, const int _sendDataSize)
 {
 	int result = send(_socket, _sendData, _sendDataSize, 0);
 	return result;
 }
 
-int BaseSocket::Sendto(char *_sendData, const int _sendDataSize)
+int BaseSocket::Sendto(const char *_sendData, const int _sendDataSize)
 {
 	int len = sendto(m_socket, _sendData, _sendDataSize, 0, result->ai_addr, result->ai_addrlen);
 	return len;
 }
 
-int BaseSocket::Sendto(sockaddr_in *_addr, char *_sendData, const int _sendDataSize)
+int BaseSocket::Sendto(const sockaddr_in *_addr, const char *_sendData, const int _sendDataSize)
 {
 	int len = sendto(m_socket, _sendData, _sendDataSize, 0, (struct sockaddr *)_addr, sizeof(sockaddr));
 	return len;

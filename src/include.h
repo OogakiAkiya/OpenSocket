@@ -36,10 +36,6 @@
 #include <cstring>
 #include <sys/ioctl.h>
 #include <fstream>
-#include "BaseSocket.h"
-#include "BaseRoutine.h"
-#include "BaseClient.h"
-#include "BaseServer.h"
 
 #endif
 
