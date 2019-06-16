@@ -68,7 +68,7 @@ int TCP_Server::GetRecvDataSize()
 	return recvDataQueList.size();
 }
 
-int TCP_Server::SendOnlyClient(int _socket, char * _buf, int _bufSize)
+int TCP_Server::SendOnlyClient(const int _socket, const char * _buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
@@ -83,7 +83,7 @@ int TCP_Server::SendOnlyClient(int _socket, char * _buf, int _bufSize)
 	return sendDataSize;
 }
 
-int TCP_Server::SendAllClient(char * _buf, int _bufSize)
+int TCP_Server::SendAllClient(const char * _buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
@@ -127,7 +127,7 @@ int UDP_Server::GetRecvDataSize()
 	return U_recvDataQueList.size();
 }
 
-int UDP_Server::SendOnlyClient(sockaddr * _addr, char * _buf, int _bufSize)
+int UDP_Server::SendOnlyClient(const sockaddr * _addr, const char * _buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
@@ -146,7 +146,7 @@ int UDP_Server::SendOnlyClient(sockaddr * _addr, char * _buf, int _bufSize)
 	return len;
 }
 
-int UDP_Server::SendMultiClient(std::vector<sockaddr> _addrList, char * _buf, int _bufSize)
+int UDP_Server::SendMultiClient(const std::vector<sockaddr> _addrList, const char * _buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
@@ -241,7 +241,7 @@ int TCP_Server::GetRecvDataSize()
 	return recvDataQueList.size();
 }
 
-int TCP_Server::SendOnlyClient(int _socket, char *_buf, int _bufSize)
+int TCP_Server::SendOnlyClient(const int _socket, const char *_buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
@@ -258,7 +258,7 @@ int TCP_Server::SendOnlyClient(int _socket, char *_buf, int _bufSize)
 	return sendDataSize;
 }
 
-int TCP_Server::SendAllClient(char *_buf, int _bufSize)
+int TCP_Server::SendAllClient(const char *_buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
@@ -306,7 +306,7 @@ int UDP_Server::GetRecvDataSize()
 	return U_recvDataQueList.size();
 }
 
-int UDP_Server::SendOnlyClient(sockaddr_in *_addr, char *_buf, int _bufSize)
+int UDP_Server::SendOnlyClient(const sockaddr_in *_addr, const char *_buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
@@ -327,7 +327,7 @@ int UDP_Server::SendOnlyClient(sockaddr_in *_addr, char *_buf, int _bufSize)
 	return len;
 }
 
-int UDP_Server::SendMultiClient(std::vector<sockaddr_in> _addrList, char *_buf, int _bufSize)
+int UDP_Server::SendMultiClient(const std::vector<sockaddr_in> _addrList, const char *_buf, const int _bufSize)
 {
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];

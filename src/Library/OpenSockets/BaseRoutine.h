@@ -2,7 +2,6 @@
 #define BASEROUTINE_h
 
 #ifdef _MSC_VER
-class BaseSocket;
 
 class BaseRoutine {
 public:
