@@ -9,22 +9,6 @@
 //Class BaseServer
 //===============================================================
 
-std::pair<int, std::vector<char>> BaseServer::TCP_GetRecvData()
-{
-	std::pair<int, std::vector<char>> returnData;
-	returnData = recvDataQueList.front();
-	recvDataQueList.pop();
-	return returnData;
-}
-
-std::pair<sockaddr, std::vector<char>> BaseServer::UDP_GetRecvData()
-{
-	std::pair<sockaddr, std::vector<char>> returnData;
-	returnData = U_recvDataQueList.front();
-	U_recvDataQueList.pop();
-	return returnData;
-}
-
 void BaseServer::SwitchIpv(std::shared_ptr<BaseSocket> _socket, int _ipv) {
 	if (_ipv == IPV4)_socket->SetProtocolVersion_IPv4();
 	if (_ipv == IPV6)_socket->SetProtocolVersion_IPv6();
@@ -34,7 +18,7 @@ void BaseServer::SwitchIpv(std::shared_ptr<BaseSocket> _socket, int _ipv) {
 //===============================================================
 //Class TCP_Server
 //===============================================================
-std::shared_ptr<BaseServer> TCP_Server::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
+std::shared_ptr<TCP_Server> TCP_Server::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
 {
 	std::shared_ptr<TCP_Server> temp = std::make_shared<TCP_Server>();
 
@@ -98,10 +82,18 @@ int TCP_Server::SendAllClient(const char * _buf, const int _bufSize)
 	return sendDataSize;
 }
 
+std::pair<int, std::vector<char>> TCP_Server::GetRecvData()
+{
+	std::pair<int, std::vector<char>> returnData;
+	returnData = recvDataQueList.front();
+	recvDataQueList.pop();
+	return returnData;
+}
+
 //===============================================================
 //Class UDP_Server
 //===============================================================
-std::shared_ptr<BaseServer> UDP_Server::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
+std::shared_ptr<UDP_Server> UDP_Server::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
 {
 	std::shared_ptr<UDP_Server> temp = std::make_shared<UDP_Server>();
 
@@ -119,12 +111,12 @@ std::shared_ptr<BaseServer> UDP_Server::GetInstance(const std::string _addrs, co
 
 void UDP_Server::Update()
 {
-	m_routine->Update(m_socket, U_recvDataQueList);
+	m_routine->Update(m_socket, recvDataQueList);
 }
 
 int UDP_Server::GetRecvDataSize()
 {
-	return U_recvDataQueList.size();
+	return recvDataQueList.size();
 }
 
 int UDP_Server::SendOnlyClient(const sockaddr * _addr, const char * _buf, const int _bufSize)
@@ -168,27 +160,19 @@ int UDP_Server::SendMultiClient(const std::vector<sockaddr> _addrList, const cha
 	return len;
 }
 
-#endif
-#ifdef __GNUC__
-//===============================================================
-//Class BaseServer
-//===============================================================
-
-std::pair<int, std::vector<char>> BaseServer::TCP_GetRecvData()
+std::pair<sockaddr, std::vector<char>> UDP_Server::GetRecvData()
 {
-	std::pair<int, std::vector<char>> returnData;
+	std::pair<sockaddr, std::vector<char>> returnData;
 	returnData = recvDataQueList.front();
 	recvDataQueList.pop();
 	return returnData;
 }
 
-std::pair<sockaddr_in, std::vector<char>> BaseServer::UDP_GetRecvData()
-{
-	std::pair<sockaddr_in, std::vector<char>> returnData;
-	returnData = U_recvDataQueList.front();
-	U_recvDataQueList.pop();
-	return returnData;
-}
+#endif
+#ifdef __GNUC__
+//===============================================================
+//Class BaseServer
+//===============================================================
 
 void BaseServer::SwitchIpv(std::shared_ptr<BaseSocket> _socket, int _ipv)
 {
@@ -274,6 +258,14 @@ int TCP_Server::SendAllClient(const char *_buf, const int _bufSize)
 	return sendDataSize;
 }
 
+std::pair<int, std::vector<char>> TCP_Server::GetRecvData()
+{
+	std::pair<int, std::vector<char>> returnData;
+	returnData = recvDataQueList.front();
+	recvDataQueList.pop();
+	return returnData;
+}
+
 //===============================================================
 //Class UDP_Server
 //===============================================================
@@ -298,12 +290,12 @@ std::shared_ptr<BaseServer> UDP_Server::GetInstance(const std::string _addrs, co
 
 void UDP_Server::Update()
 {
-	m_routine->Update(m_socket, U_recvDataQueList);
+	m_routine->Update(m_socket, recvDataQueList);
 }
 
 int UDP_Server::GetRecvDataSize()
 {
-	return U_recvDataQueList.size();
+	return recvDataQueList.size();
 }
 
 int UDP_Server::SendOnlyClient(const sockaddr_in *_addr, const char *_buf, const int _bufSize)
@@ -351,6 +343,14 @@ int UDP_Server::SendMultiClient(const std::vector<sockaddr_in> _addrList, const 
 	}
 
 	return len;
+}
+
+std::pair<sockaddr, std::vector<char>> UDP_Server::GetRecvData()
+{
+	std::pair<sockaddr, std::vector<char>> returnData;
+	returnData = recvDataQueList.front();
+	recvDataQueList.pop();
+	return returnData;
 }
 
 #endif

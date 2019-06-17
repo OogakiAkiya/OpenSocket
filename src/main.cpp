@@ -11,14 +11,14 @@ int main() {
 
 		//データ送信処理
 		while (server->GetRecvDataSize()>0) {
-			auto recvData = server->TCP_GetRecvData();
+			auto recvData = server->GetRecvData();
 			int sendDataSize = server->SendOnlyClient(recvData.first, &recvData.second[0], recvData.second.size());
 		}
 	}
 	*/
 
 	//TCP_Client
-	/*
+	
 	std::shared_ptr<BaseClient> client;
 	while (1) {
 		client = TCP_Client::GetInstance("127.0.0.1", "12345", IPV4,true);
@@ -34,15 +34,18 @@ int main() {
 	char tem[6] = "HELLO";
 	int dataSize=client->SendServer(tem, sizeof(tem));
 	printf("SendData=%d\n", dataSize);
-	while (client->GetRecvDataSize() == 0) {
+
+	while (1) {
 		client->Update();
+		if (client->GetRecvDataSize() > 0) {
+			//受信処理
+			std::vector<char> temp = client->GetRecvData();
+			char buf[100];
+			std::memcpy(buf, &temp[0], temp.size());
+			printf("%s\n", buf);
+			client->SendServer(&temp[0], temp.size());
+		}
 	}
-	//受信処理
-	std::vector<char> temp=client->GetRecvData();
-	char buf[100];
-	std::memcpy(buf, &temp[0], temp.size());
-	printf("%s\n\n", buf);
-	*/
 
 
 	//=============================================================
@@ -54,7 +57,7 @@ int main() {
 	while (1) {
 		server->Update();
 		if (server->GetRecvDataSize() > 0) {
-			auto temp=server->UDP_GetRecvData();
+			auto temp=server->GetRecvData();
 			unsigned int sequence;
 			std::memcpy(&sequence, &temp.second[0], sizeof(unsigned int));
 			printf("Recv(%d)=%s\n", sequence, &temp.second[sizeof(unsigned int)]);

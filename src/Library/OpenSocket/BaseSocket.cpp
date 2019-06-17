@@ -279,7 +279,7 @@ std::shared_ptr<BaseSocket> BaseSocket::Accept()
 	socklen_t len = sizeof(client);
 	int sock = -1;
 	sock = accept(m_socket, (struct sockaddr *)&client, &len);
-	if (sock <0||sock==0)
+	if (sock <0)
 	{
 		return nullptr;
 	}
