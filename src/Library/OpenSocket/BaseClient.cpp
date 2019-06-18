@@ -209,7 +209,6 @@ std::vector<char> UDP_Client::GetRecvData()
 
 int UDP_Client::SendServer(const char *_buf, const int _bufSize)
 {
-	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
 
 	//ヘッダーを付加し送信

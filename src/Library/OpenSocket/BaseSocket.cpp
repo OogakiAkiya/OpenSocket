@@ -226,8 +226,13 @@ void BaseSocket::SetProtocol_UDP()
 }
 void BaseSocket::SetAsynchronous()
 {
-	unsigned long value = 1;
-	ioctl(m_socket, FIONBIO, &value); //非同期通信化
+	//unsigned long value = 1;
+	int value = 1;
+	int a = ioctl(m_socket, FIONBIO, &value); //非同期通信化
+	if (a == -1)
+	{
+		printf("error");
+	}
 }
 bool BaseSocket::AddressSet()
 {
@@ -254,8 +259,6 @@ void BaseSocket::Close()
 
 bool BaseSocket::Bind()
 {
-	int erro;
-	int len = sizeof(*result);
 	if (bind(m_socket, result->ai_addr, result->ai_addrlen) != 0)
 	{
 		close(m_socket);
@@ -275,7 +278,6 @@ bool BaseSocket::Listen()
 
 std::shared_ptr<BaseSocket> BaseSocket::Accept()
 {
-	std::shared_ptr<BaseSocket> temp = std::make_shared<BaseSocket>();
 	socklen_t len = sizeof(client);
 	int sock = -1;
 	sock = accept(m_socket, (struct sockaddr *)&client, &len);
@@ -283,6 +285,9 @@ std::shared_ptr<BaseSocket> BaseSocket::Accept()
 	{
 		return nullptr;
 	}
+
+	printf("接続あり\n");
+	std::shared_ptr<BaseSocket> temp = std::make_shared<BaseSocket>();
 	temp->SetSocket(sock);
 	return temp;
 }
@@ -298,10 +303,6 @@ bool BaseSocket::Connect()
 }
 int BaseSocket::Recv(char *_recvbuf, int recvbuf_size, const int flg)
 {
-	if (this == nullptr)
-	{
-		return 0;
-	}
 	int bytesize = 0;
 	bytesize = recv(m_socket, _recvbuf, recvbuf_size, 0);
 	return bytesize;
@@ -309,7 +310,6 @@ int BaseSocket::Recv(char *_recvbuf, int recvbuf_size, const int flg)
 
 int BaseSocket::Recvfrom(sockaddr_in *_senderAddr, char *_recvbuf, int recvbuf_size, const int flg)
 {
-	;
 	int bytesize = 0;
 	socklen_t sendAddrSize = sizeof(struct sockaddr);
 	bytesize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, (struct sockaddr *)_senderAddr, &sendAddrSize);

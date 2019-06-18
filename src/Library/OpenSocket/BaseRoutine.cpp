@@ -171,6 +171,12 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 	}
 	else
 	{
+		if (errno == EAGAIN)
+		{
+			//非同期だとここを基本は通る
+			return;
+		}
+
 		//接続エラーが起こった時
 		printf("recv failed\n");
 	}
@@ -215,13 +221,26 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>> &_clientList, 
 			printf("切断されました\n");
 			deleteList.push_back(i);
 		}
-		else if (dataSize == -1)
-		{
-		}
 		else
 		{
+			if (errno == EAGAIN)
+			{
+				//非同期だとここを基本は通る
+				break;
+			}
+
+			if (errno == EBADF)
+			{
+			}
+			if (errno == ECONNRESET)
+			{
+				//クライアント接続リセット
+				printf("切断されました\n");
+				deleteList.push_back(i);
+				break;
+			}
 			//接続エラーが起こった時
-			printf("recv failed=%d\n", dataSize);
+			printf("recv failed=%d\n", errno);
 			deleteList.push_back(i);
 		}
 	}
@@ -231,8 +250,8 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>> &_clientList, 
 	{
 		//受信データ削除
 		int socket = _clientList.at(element)->GetSocket();
-		_recvDataMap.at(socket).erase(_recvDataMap.at(socket).begin(), _recvDataMap.at(socket).end());
-
+		_recvDataMap.erase(socket);
+		//_recvDataMap.at(socket).erase(_recvDataMap.at(socket).begin(), _recvDataMap.at(socket).end());
 		//ソケット削除
 		_clientList.erase(_clientList.begin() + element);
 	}

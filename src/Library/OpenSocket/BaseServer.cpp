@@ -187,7 +187,7 @@ void BaseServer::SwitchIpv(std::shared_ptr<BaseSocket> _socket, int _ipv)
 //===============================================================
 //Class TCP_Server
 //===============================================================
-std::shared_ptr<BaseServer> TCP_Server::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
+std::shared_ptr<TCP_Server> TCP_Server::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
 {
 	std::shared_ptr<TCP_Server> temp = std::make_shared<TCP_Server>();
 
@@ -213,11 +213,21 @@ void TCP_Server::Update()
 	client = m_socket->Accept();
 	if (client != nullptr)
 	{
+		//socketの追加
 		clientList.push_back(client);
 		std::vector<char> recvDataList;
-		recvDataMap.insert({ client->GetSocket(), recvDataList });
+		auto ite = recvDataMap.find(client->GetSocket());
+		if (ite != recvDataMap.end())
+		{
+			recvDataMap.erase(ite);
+		}
+		recvDataMap[client->GetSocket()] = recvDataList;
 	}
-	m_routine->Update(clientList, recvDataMap, recvDataQueList);
+
+	if (clientList.size() > 0)
+	{
+		m_routine->Update(clientList, recvDataMap, recvDataQueList);
+	}
 }
 
 int TCP_Server::GetRecvDataSize()
@@ -269,7 +279,7 @@ std::pair<int, std::vector<char>> TCP_Server::GetRecvData()
 //===============================================================
 //Class UDP_Server
 //===============================================================
-std::shared_ptr<BaseServer> UDP_Server::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
+std::shared_ptr<UDP_Server> UDP_Server::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
 {
 	std::shared_ptr<UDP_Server> temp = std::make_shared<UDP_Server>();
 
@@ -300,7 +310,6 @@ int UDP_Server::GetRecvDataSize()
 
 int UDP_Server::SendOnlyClient(const sockaddr_in *_addr, const char *_buf, const int _bufSize)
 {
-	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
 
 	//ヘッダーを付加し送信
@@ -321,7 +330,6 @@ int UDP_Server::SendOnlyClient(const sockaddr_in *_addr, const char *_buf, const
 
 int UDP_Server::SendMultiClient(const std::vector<sockaddr_in> _addrList, const char *_buf, const int _bufSize)
 {
-	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
 	int len = 0;
 
@@ -345,9 +353,9 @@ int UDP_Server::SendMultiClient(const std::vector<sockaddr_in> _addrList, const 
 	return len;
 }
 
-std::pair<sockaddr, std::vector<char>> UDP_Server::GetRecvData()
+std::pair<sockaddr_in, std::vector<char>> UDP_Server::GetRecvData()
 {
-	std::pair<sockaddr, std::vector<char>> returnData;
+	std::pair<sockaddr_in, std::vector<char>> returnData;
 	returnData = recvDataQueList.front();
 	recvDataQueList.pop();
 	return returnData;
