@@ -1,15 +1,7 @@
-#include"include.h"
-
-#include"Library/OpenSockets/BaseSocket.h"
-#include"Library/OpenSockets/BaseRoutine.h"
-#include"Library/OpenSockets/BaseServer.h"
-#include"Library/OpenSockets/BaseClient.h"
-
-using namespace std;
-
+ï»¿#include"Library/OpenSocket/OpenSocket.h"
 int main() {
 	//=============================================================
-	//TCPƒTƒ“ƒvƒ‹
+	//TCPã‚µãƒ³ãƒ—ãƒ«
 	//=============================================================
 	//TCP_Server
 	/*
@@ -17,9 +9,9 @@ int main() {
 	while (1) {
 		server->Update();
 
-		//ƒf[ƒ^‘—Mˆ—
+		//ãƒ‡ãƒ¼ã‚¿é€ä¿¡å‡¦ç†
 		while (server->GetRecvDataSize()>0) {
-			auto recvData = server->TCP_GetRecvData();
+			auto recvData = server->GetRecvData();
 			int sendDataSize = server->SendOnlyClient(recvData.first, &recvData.second[0], recvData.second.size());
 		}
 	}
@@ -27,7 +19,7 @@ int main() {
 
 	//TCP_Client
 	/*
-	shared_ptr<BaseClient> client;
+	std::shared_ptr<BaseClient> client;
 	while (1) {
 		client = TCP_Client::GetInstance("127.0.0.1", "12345", IPV4,true);
 		if (client) {
@@ -38,23 +30,26 @@ int main() {
 		}
 	}
 
-	//‘—Mˆ—(‰¼)
+	//é€ä¿¡å‡¦ç†(ä»®)
 	char tem[6] = "HELLO";
 	int dataSize=client->SendServer(tem, sizeof(tem));
 	printf("SendData=%d\n", dataSize);
-	while (client->GetRecvDataSize() == 0) {
+
+	while (1) {
 		client->Update();
+		if (client->GetRecvDataSize() > 0) {
+			//å—ä¿¡å‡¦ç†
+			std::vector<char> temp = client->GetRecvData();
+			char buf[100];
+			std::memcpy(buf, &temp[0], temp.size());
+			printf("%s\n", buf);
+			client->SendServer(&temp[0], temp.size());
+		}
 	}
-	//óMˆ—
-	std::vector<char> temp=client->GetRecvData();
-	char buf[100];
-	memcpy(buf, &temp[0], temp.size());
-	printf("%s\n\n", buf);
+
 	*/
-
-
 	//=============================================================
-	//UDPƒTƒ“ƒvƒ‹
+	//UDPã‚µãƒ³ãƒ—ãƒ«
 	//=============================================================
 	//Server
 	/*
@@ -62,9 +57,9 @@ int main() {
 	while (1) {
 		server->Update();
 		if (server->GetRecvDataSize() > 0) {
-			auto temp=server->UDP_GetRecvData();
+			auto temp=server->GetRecvData();
 			unsigned int sequence;
-			memcpy(&sequence, &temp.second[0], sizeof(unsigned int));
+			std::memcpy(&sequence, &temp.second[0], sizeof(unsigned int));
 			printf("Recv(%d)=%s\n", sequence, &temp.second[sizeof(unsigned int)]);
 			int sendDataSize=server->SendOnlyClient(&temp.first, &temp.second[sizeof(unsigned int)], temp.second.size()- sizeof(unsigned int));
 			printf("Send=%d\n", sendDataSize);
@@ -73,7 +68,7 @@ int main() {
 	*/
 	//Client
 	/*
-	shared_ptr<BaseClient> client;
+	std::shared_ptr<BaseClient> client;
 	client = UDP_Client::GetInstance("127.0.0.1", "12345", IPVD, true);
 	char tem[6] = "HELLO";
 	int len=client->SendServer(&tem[0], sizeof(tem));
@@ -83,7 +78,7 @@ int main() {
 		if (client->GetRecvDataSize() > 0) {
 			std::vector<char> temp = client->GetRecvData();
 			unsigned int sequence;
-			memcpy(&sequence, &temp[0], sizeof(unsigned int));
+			std::memcpy(&sequence, &temp[0], sizeof(unsigned int));
 			printf("Recv(%d)=%s\n", sequence, &temp[sizeof(unsigned int)]);
 
 			len=client->SendServer(&temp[sizeof(unsigned int)], temp.size()-sizeof(unsigned int));
