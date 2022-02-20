@@ -84,7 +84,7 @@ std::shared_ptr<BaseClient> UDP_Client::GetInstance(const std::string _addrs, co
 
 std::vector<char> UDP_Client::GetRecvData()
 {
-	std::pair<B_ADDRESS, std::vector<char>> returnData;
+	std::pair<B_ADDRESS_IN, std::vector<char>> returnData;
 	returnData = recvDataQueList.front();
 	recvDataQueList.pop();
 	return returnData.second;

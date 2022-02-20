@@ -81,15 +81,16 @@ bool BaseSocket::AddressSet()
 	//ソケットの作成
 	m_socket = B_INIT_SOCKET;
 	m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-	if (m_socket == INVALID_SOCKET) {
-		freeaddrinfo(result);							//メモリの解放
 
 #ifdef _MSC_VER
+	if (m_socket == INVALID_SOCKET) {
 		printf("Error at socket():%ld\n", WSAGetLastError());
 		WSACleanup();									//ソケットの解放
 #else
+	if (m_socket < 0) {
 		printf("Error at socket()\n");
 #endif
+		freeaddrinfo(result);							//メモリの解放
 		is_available = true;
 		return false;
 	}
@@ -98,14 +99,14 @@ bool BaseSocket::AddressSet()
 
 void BaseSocket::Close()
 {
-	int error = shutdown(m_socket, SD_SEND);			//今送っている情報を送りきって終わる
-	if (error == SOCKET_ERROR) printf("socket close error\n");
-	freeaddrinfo(result);
-
+	int error = shutdown(m_socket, B_SHUTDOWN);			//今送っている情報を送りきって終わる
 #ifdef _MSC_VER
+	freeaddrinfo(result);
+	if (error == SOCKET_ERROR) printf("socket close error\n");
 	closesocket(m_socket);
 	WSACleanup();
 #else
+	if (error < 0) printf("socket close error\n");
 	close(m_socket);
 #endif
 
@@ -119,11 +120,17 @@ int BaseSocket::Recv(char* _recvbuf, int recvbuf_size, const int flg)
 	return bytesize;
 }
 
-int BaseSocket::Recvfrom(sockaddr* _senderAddr, char* _recvbuf, int recvbuf_size, const int flg)
+int BaseSocket::Recvfrom(B_ADDRESS_IN* _senderAddr, char* _recvbuf, int recvbuf_size, const int flg)
 {
 	int bytesize = 0;
-	int sendAddrSize = sizeof(sockaddr);
+	B_ADDRESS_LEN sendAddrSize = sizeof(B_ADDRESS);
+
+#ifdef _MSC_VER
 	bytesize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, _senderAddr, &sendAddrSize);
+#else
+	bytesize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, (struct sockaddr *)_senderAddr, &sendAddrSize);
+#endif
+
 	return bytesize;
 }
 
@@ -146,9 +153,14 @@ int BaseSocket::Sendto(const char* _sendData, const int _sendDataSize)
 	return len;
 }
 
-int BaseSocket::Sendto(const sockaddr* _addr, const char* _sendData, const int _sendDataSize)
+int BaseSocket::Sendto(const B_ADDRESS_IN* _addr, const char* _sendData, const int _sendDataSize)
 {
-	int len = sendto(m_socket, _sendData, _sendDataSize, 0, _addr, sizeof(sockaddr));
+#ifdef _MSC_VER
+	int len = sendto(m_socket, _sendData, _sendDataSize, 0, _addr, sizeof(B_ADDRESS_IN));
+#else
+	int len = sendto(m_socket, _sendData, _sendDataSize, 0, (struct sockaddr *)_addr, sizeof(sockaddr));
+#endif
+
 	return len;
 }
 
@@ -163,7 +175,6 @@ bool BaseSocket::Bind()
 		WSACleanup();
 #else
 		printf("Bind failed with error\n");
-		close(m_socket);
 #endif
 		return false;
 	}
@@ -222,7 +233,6 @@ bool BaseSocket::Connect()
 			}
 #else
 			printf("Unable to server!\n");
-			close(m_socket);
 #endif
 			return false;
 

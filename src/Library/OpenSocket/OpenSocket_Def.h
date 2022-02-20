@@ -3,7 +3,7 @@
 #define IPVD 3
 #define SEQUENCEMAX 4200000000
 
-//ƒoƒbƒtƒ@ƒTƒCƒY‚Í1Mbyte
+//ï¿½oï¿½bï¿½tï¿½@ï¿½Tï¿½Cï¿½Yï¿½ï¿½1Mbyte
 //#define TCP_BUFFERSIZE 1048576
 #define TCP_BUFFERSIZE 2048
 
@@ -14,11 +14,13 @@
 #define B_ADDRESS sockaddr
 #define B_ADDRESS_LEN int
 #define B_ADDRESS_IN sockaddr
+#define B_SHUTDOWN SD_BOTH
+
 #else
 #define B_SOCKET int
-#define B_INIT_SOCKET - 1
+#define B_INIT_SOCKET -1
 #define B_ADDRESS struct sockaddr
 #define B_ADDRESS_LEN socklen_t
 #define B_ADDRESS_IN sockaddr_in
-
+#define B_SHUTDOWN SHUT_RDWR
 #endif
