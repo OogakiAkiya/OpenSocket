@@ -101,7 +101,6 @@ void BaseSocket::Close()
 {
 	int error = shutdown(m_socket, B_SHUTDOWN);			//今送っている情報を送りきって終わる
 #ifdef _MSC_VER
-	freeaddrinfo(result);
 	if (error == SOCKET_ERROR) printf("socket close error\n");
 	closesocket(m_socket);
 	WSACleanup();
@@ -175,6 +174,7 @@ bool BaseSocket::Bind()
 		WSACleanup();
 #else
 		printf("Bind failed with error\n");
+		close(m_socket);
 #endif
 		return false;
 	}
