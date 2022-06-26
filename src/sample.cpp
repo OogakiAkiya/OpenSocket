@@ -1,10 +1,10 @@
-﻿#include"Library/OpenSocket/OpenSocket.h"
+﻿#include "Library/OpenSocket/OpenSocket.h"
 int main() {
+	/*
 	//=============================================================
 	//TCPサンプル
 	//=============================================================
 	//TCP_Server
-	/*
 	auto server = TCP_Server::GetInstance("0.0.0.0", "12345", IPV4,true);
 	while (1) {
 		server->Update();
@@ -16,7 +16,6 @@ int main() {
 		}
 	}
 	*/
-
 	//TCP_Client
 	/*
 	std::shared_ptr<BaseClient> client;
@@ -46,8 +45,8 @@ int main() {
 			client->SendServer(&temp[0], temp.size());
 		}
 	}
-
 	*/
+
 	//=============================================================
 	//UDPサンプル
 	//=============================================================
@@ -85,5 +84,4 @@ int main() {
 		}
 	}
 	*/
-	return 0;
 }

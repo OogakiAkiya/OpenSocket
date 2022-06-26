@@ -1,9 +1,9 @@
 # OpenSocket
 ## build
+./src/sample.cppのコメントアウトを外しserverとclientそれぞれでbuildを実施し実行ファイルを作成する
 
 ```sh
-make Server or Client
-
-//delete all obj,exe files
-make clean
+$ cmake -S . -B build
+$ cmake --build build
+$ ./build/OpenSocket.out
 ```
