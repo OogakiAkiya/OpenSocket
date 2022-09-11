@@ -67,11 +67,10 @@ bool BaseSocket::AddressSet()
 #endif
 	hints.ai_flags = AI_PASSIVE;
 
-
-
 	if ((error = getaddrinfo(ip.c_str(), port.c_str(), &hints, &result)) != 0)
 	{
-		printf("getaddrinfo failed %d : %s\n", error, gai_strerror(error));
+		std::cerr << "getaddrinfo failed " << error << " " << gai_strerror(error) << std::endl;
+
 #ifdef _MSC_VER
 		WSACleanup();
 #endif
@@ -84,11 +83,13 @@ bool BaseSocket::AddressSet()
 
 #ifdef _MSC_VER
 	if (m_socket == INVALID_SOCKET) {
-		printf("Error at socket():%ld\n", WSAGetLastError());
+		std::cerr << "Error at socket() : " << WSAGetLastError() << std::endl;
+
+		std::cerr <<
 		WSACleanup();									//ソケットの解放
 #else
 	if (m_socket < 0) {
-		printf("Error at socket()\n");
+		std::cerr << "Error at socket()" << std::endl;
 #endif
 		freeaddrinfo(result);							//メモリの解放
 		is_available = true;
@@ -101,11 +102,12 @@ void BaseSocket::Close()
 {
 	int error = shutdown(m_socket, B_SHUTDOWN);			//今送っている情報を送りきって終わる
 #ifdef _MSC_VER
-	if (error == SOCKET_ERROR) printf("socket close error\n");
+	if (error == SOCKET_ERROR) std::cerr << "socket close error" << std::endl;
+
 	closesocket(m_socket);
 	WSACleanup();
 #else
-	if (error < 0) printf("socket close error\n");
+	if (error < 0) std::cerr << "socket close error" << std::endl;
 	close(m_socket);
 #endif
 
@@ -125,7 +127,8 @@ int BaseSocket::Recvfrom(B_ADDRESS_IN* _senderAddr, char* _recvbuf, int recvbuf_
 	B_ADDRESS_LEN sendAddrSize = sizeof(B_ADDRESS);
 
 #ifdef _MSC_VER
-	bytesize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, _senderAddr, &sendAddrSize);
+	//bytesize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, _senderAddr, &sendAddrSize);
+	bytesize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, (struct sockaddr*)_senderAddr, &sendAddrSize);
 #else
 	bytesize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, (struct sockaddr *)_senderAddr, &sendAddrSize);
 #endif
@@ -136,7 +139,12 @@ int BaseSocket::Recvfrom(B_ADDRESS_IN* _senderAddr, char* _recvbuf, int recvbuf_
 int BaseSocket::Send(const char* _sendData, const int _sendDataSize)
 {
 	int result = 0;
-	result = send(m_socket, _sendData, _sendDataSize, 0);
+	try {
+		result = send(m_socket, _sendData, _sendDataSize, 0);
+	}
+	catch (std::exception e) {
+		std::cerr << e.what() << std::endl;
+	}
 	return result;
 }
 
@@ -155,7 +163,8 @@ int BaseSocket::Sendto(const char* _sendData, const int _sendDataSize)
 int BaseSocket::Sendto(const B_ADDRESS_IN* _addr, const char* _sendData, const int _sendDataSize)
 {
 #ifdef _MSC_VER
-	int len = sendto(m_socket, _sendData, _sendDataSize, 0, _addr, sizeof(B_ADDRESS_IN));
+	//int len = sendto(m_socket, _sendData, _sendDataSize, 0, _addr, sizeof(B_ADDRESS_IN));
+	int len = sendto(m_socket, _sendData, _sendDataSize, 0, (struct sockaddr*)_addr, sizeof(sockaddr));
 #else
 	int len = sendto(m_socket, _sendData, _sendDataSize, 0, (struct sockaddr *)_addr, sizeof(sockaddr));
 #endif
@@ -169,11 +178,11 @@ bool BaseSocket::Bind()
 
 		freeaddrinfo(result);																//メモリの解放
 #ifdef _MSC_VER
-		printf("Bind failed with error: %d\n", WSAGetLastError());
+		std::cerr << "Bind failed with error: " << WSAGetLastError() << std::endl;
 		closesocket(m_socket);
 		WSACleanup();
 #else
-		printf("Bind failed with error\n");
+		std::cerr << "Bind failed with error" << std::endl;
 		close(m_socket);
 #endif
 		return false;
@@ -185,11 +194,11 @@ bool BaseSocket::Listen()
 {
 	if (listen(m_socket, SOMAXCONN) != 0) {										//バックログのサイズを設定
 #ifdef _MSC_VER
-		printf("Listen failed with error:%ld\n", WSAGetLastError());
+		std::cerr << "Listen failed with error: " << WSAGetLastError() << std::endl;
 		closesocket(m_socket);
 		WSACleanup();
 #else
-		printf("Listen failed with error\n");
+		std::cerr << "Listen failed with error" << std::endl;
 		close(m_socket);
 #endif
 		return false;
@@ -211,8 +220,7 @@ std::shared_ptr<BaseSocket> BaseSocket::Accept()
 #else
 	if (recvSocket < 0) return nullptr;
 #endif
-
-	printf("Accept success\n");
+	std::cout << "Accept success" << std::endl;
 	client->SetSocket(recvSocket);
 	return client;
 }
@@ -228,11 +236,11 @@ bool BaseSocket::Connect()
 				m_socket = INVALID_SOCKET;
 			}
 			if (m_socket == INVALID_SOCKET) {
-				printf("Unable to server!\n");
+				std::cerr << "Unable to server!" << std::endl;
 				WSACleanup();
 			}
 #else
-			printf("Unable to server!\n");
+			std::cerr << "Unable to server!" << std::endl;
 #endif
 			return false;
 

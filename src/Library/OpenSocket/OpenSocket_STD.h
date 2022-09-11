@@ -5,7 +5,6 @@
 
 #ifdef _MSC_VER
 #pragma comment(lib,"ws2_32.lib")
-#include<iostream>
 #include<sstream>
 #include<WinSock2.h>
 #include<Ws2tcpip.h>
@@ -30,7 +29,7 @@
 #include <fstream>
 
 #endif
-
+#include<iostream>
 #include<stdio.h>
 #include<vector>
 #include<mutex>

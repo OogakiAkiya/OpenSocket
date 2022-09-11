@@ -34,7 +34,7 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 	}
 	else if (dataSize == 0) {
 		//接続を終了するとき
-		printf("切断されました\n");
+		std::cout << "connection is lost" << std::endl;
 	}
 #ifdef _MSC_VER
 	else if (WSAGetLastError() == 10035) {
@@ -44,7 +44,7 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 	else {
 #ifdef _MSC_VER
 		//接続エラーが起こった時
-		printf("recv failed:%d\n%d", WSAGetLastError(), dataSize);
+		std::cerr << "recv failed:" << WSAGetLastError() << std::endl;
 #else
 		if (errno == EAGAIN)
 		{
@@ -53,7 +53,8 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 		}
 
 		//接続エラーが起こった時
-		printf("recv failed\n");
+		std::cerr << "recv failed" << std::endl;
+
 #endif
 
 	}
@@ -99,7 +100,7 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 		}
 		else if (dataSize == 0) {
 			//接続を終了するとき
-			printf("切断されました\n");
+			std::cout << "connection is lost" << std::endl;
 			deleteList.push_back(i);
 		}
 #ifdef _MSC_VER
@@ -111,7 +112,7 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 #ifdef _MSC_VER
 
 			//接続エラーが起こった時
-			printf("recv failed:%d\n%d", WSAGetLastError(), dataSize);
+			std::cerr << "recv failed:" << WSAGetLastError() << std::endl;
 			deleteList.push_back(i);
 #else
 			if (errno == EAGAIN)
@@ -126,12 +127,12 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 			if (errno == ECONNRESET)
 			{
 				//クライアント接続リセット
-				printf("切断されました\n");
+				std::cout << "connection is lost" << std::endl;
 				deleteList.push_back(i);
 				break;
 			}
 			//接続エラーが起こった時
-			printf("recv failed=%d\n", errno);
+			std::cerr << "recv failed:" << errno << std::endl;
 			deleteList.push_back(i);
 #endif
 
