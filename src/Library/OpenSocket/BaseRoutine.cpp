@@ -20,7 +20,25 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 
 		while (_recvData.size() > sizeof(int)) {
 			int dataSize;
-			memcpy(&dataSize, &_recvData[0], sizeof(int));
+			try {
+				//先頭パケットの解析
+				memcpy(&dataSize, &_recvData[0], sizeof(int));
+
+				//先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
+				if (dataSize < 0 || dataSize > RECVPACKETMAXSIZE) {
+					//TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
+					_recvData.clear();
+					return;
+				}
+			}
+			catch (std::exception e) {
+				std::cerr << "Exception Error at TCP_Routine::Update():" << e.what() << std::endl;
+
+				//TODO:不正パケットなどで先頭データがintでmemcpyできなかった際はパケットをすべて削除しているが何かいい手がないか考える
+				_recvData.clear();
+				return;
+			}
+
 
 			//受信データが一塊分あればキューに追加
 			if (_recvData.size() > dataSize) {
@@ -37,7 +55,7 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 		std::cout << "connection is lost" << std::endl;
 	}
 #ifdef _MSC_VER
-	else if (WSAGetLastError() == 10035) {
+	else if (WSAGetLastError() == WSAEWOULDBLOCK) {
 		//clientがsendしていなかったときにおこるエラー(returnで良いかも)
 	}
 #endif
@@ -68,6 +86,7 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 		char buf[TCP_BUFFERSIZE];
 		int socket = _clientList.at(i)->GetSocket();
 
+		//データを受信した際はそのバイト数が切断された場合は0,ノンブロッキングモードでデータを受信してない間は-1がdataSizeに入る
 		int dataSize = _clientList.at(i)->Recv(buf, TCP_BUFFERSIZE);
 
 		if (dataSize > 0) {
@@ -78,13 +97,24 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 			memcpy((char*)&_recvDataMap[socket][nowSize], &buf[0], dataSize);
 
 			while (_recvDataMap[socket].size() > sizeof(int)) {
+
 				int dataSize=0;
-#ifdef _MSC_VER
-				//ここのキャストunixも同じキャストでよさそう
-				memcpy(&dataSize, &_recvDataMap[(B_SOCKET)socket][0], sizeof(int));
-#else
-				memcpy(&dataSize, &_recvDataMap.at(socket)[0], sizeof(int));
-#endif
+				try {
+					memcpy(&dataSize, &_recvDataMap[(B_SOCKET)socket][0], sizeof(int));
+
+					//先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
+					if (dataSize < 0 || dataSize > RECVPACKETMAXSIZE) {
+						//TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
+						_recvDataMap[(B_SOCKET)socket].clear();
+					}
+				}
+				catch (std::exception e) {
+					std::cerr << "Exception Error at TCP_Routine::Update():" << e.what() << std::endl;
+
+					//TODO:不正パケットなどで先頭データがintでmemcpyできなかった際はパケットをすべて削除しているが何かいい手がないか考える
+					_recvDataMap[(B_SOCKET)socket].clear();
+					return;
+				}
 
 				//受信データが一塊分あればキューリストに追加
 				if (_recvDataMap[socket].size() > dataSize) {
@@ -104,7 +134,7 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 			deleteList.push_back(i);
 		}
 #ifdef _MSC_VER
-		else if (WSAGetLastError() == 10035) {
+		else if (WSAGetLastError() == WSAEWOULDBLOCK) {
 			//clientがsendしていなかったときにおこるエラー
 		}
 #endif
@@ -115,9 +145,10 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 			std::cerr << "recv failed:" << WSAGetLastError() << std::endl;
 			deleteList.push_back(i);
 #else
+			//errnoはシステムコールや標準ライブラリのエラーが格納される変数
 			if (errno == EAGAIN)
 			{
-				//非同期だとここを基本は通る
+				//非同期だとここを通ることがあるが無視して良い
 				break;
 			}
 

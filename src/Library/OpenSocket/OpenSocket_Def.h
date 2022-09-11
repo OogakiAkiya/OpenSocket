@@ -2,6 +2,7 @@
 #define IPV6 2
 #define IPVD 3
 #define SEQUENCEMAX 4200000000
+#define RECVPACKETMAXSIZE 1000000
 
 //�o�b�t�@�T�C�Y��1Mbyte
 //#define TCP_BUFFERSIZE 1048576
@@ -13,7 +14,7 @@
 #define B_INIT_SOCKET INVALID_SOCKET
 #define B_ADDRESS sockaddr
 #define B_ADDRESS_LEN int
-#define B_ADDRESS_IN sockaddr
+#define B_ADDRESS_IN sockaddr_in
 #define B_SHUTDOWN SD_BOTH
 
 #else

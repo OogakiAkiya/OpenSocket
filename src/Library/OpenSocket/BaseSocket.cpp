@@ -47,7 +47,7 @@ void BaseSocket::SetAsynchronous()
 	ioctlsocket(m_socket, FIONBIO, &value);					//非同期通信化
 #else
 	int value = 1;
-	int result = ioctl(m_socket, FIONBIO, &value); //非同期通信化
+	int code = ioctl(m_socket, FIONBIO, &value); //非同期通信化
 #endif
 
 }
@@ -55,44 +55,49 @@ void BaseSocket::SetAsynchronous()
 bool BaseSocket::AddressSet()
 {
 	int error;
-
+	try {
 #ifdef _MSC_VER
-	WSADATA wsaData;
-	//socket使用可能かのチェック
-	error = WSAStartup(MAKEWORD(2, 2), &wsaData);
-	if (error != 0) {
-		is_available = true;
-		return false;
-	}
+		WSADATA wsaData;
+		//socket使用可能かのチェック
+		error = WSAStartup(MAKEWORD(2, 2), &wsaData);
+		if (error != 0) {
+			is_available = true;
+			return false;
+		}
 #endif
-	hints.ai_flags = AI_PASSIVE;
+		hints.ai_flags = AI_PASSIVE;
 
-	if ((error = getaddrinfo(ip.c_str(), port.c_str(), &hints, &result)) != 0)
-	{
-		std::cerr << "getaddrinfo failed " << error << " " << gai_strerror(error) << std::endl;
+		if ((error = getaddrinfo(ip.c_str(), port.c_str(), &hints, &result)) != 0)
+		{
+			std::cerr << "getaddrinfo failed " << error << " " << gai_strerror(error) << std::endl;
 
 #ifdef _MSC_VER
-		WSACleanup();
+			WSACleanup();
 #endif
-		return false;
-	}
+			return false;
+		}
 
-	//ソケットの作成
-	m_socket = B_INIT_SOCKET;
-	m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+		//ソケットの作成
+		m_socket = B_INIT_SOCKET;
+		m_socket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 
 #ifdef _MSC_VER
-	if (m_socket == INVALID_SOCKET) {
-		std::cerr << "Error at socket() : " << WSAGetLastError() << std::endl;
+		if (m_socket == INVALID_SOCKET) {
+			std::cerr << "Error at socket() : " << WSAGetLastError() << std::endl;
 
-		std::cerr <<
-		WSACleanup();									//ソケットの解放
+			std::cerr <<
+				WSACleanup();									//ソケットの解放
 #else
-	if (m_socket < 0) {
-		std::cerr << "Error at socket()" << std::endl;
+		if (m_socket < 0) {
+			std::cerr << "Error at socket()" << std::endl;
 #endif
-		freeaddrinfo(result);							//メモリの解放
-		is_available = true;
+			freeaddrinfo(result);							//メモリの解放
+			is_available = true;
+			return false;
+		}
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at AddressSet():" << e.what() << std::endl;
 		return false;
 	}
 	return true;
@@ -116,75 +121,111 @@ void BaseSocket::Close()
 int BaseSocket::Recv(char* _recvbuf, int recvbuf_size, const int flg)
 {
 	if (this == nullptr)return 0;
-	int bytesize = 0;
-	bytesize = recv(m_socket, _recvbuf, recvbuf_size, 0);
-	return bytesize;
+	int byteSize = 0;
+	try {
+		byteSize = recv(m_socket, _recvbuf, recvbuf_size, 0);
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at Recv():" << e.what() << std::endl;
+	}
+
+	return byteSize;
 }
 
 int BaseSocket::Recvfrom(B_ADDRESS_IN* _senderAddr, char* _recvbuf, int recvbuf_size, const int flg)
 {
-	int bytesize = 0;
-	B_ADDRESS_LEN sendAddrSize = sizeof(B_ADDRESS);
+	int byteSize = 0;
+
+	try {
+		B_ADDRESS_LEN sendAddrSize = sizeof(B_ADDRESS);
 
 #ifdef _MSC_VER
-	//bytesize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, _senderAddr, &sendAddrSize);
-	bytesize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, (struct sockaddr*)_senderAddr, &sendAddrSize);
+		//byteSize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, _senderAddr, &sendAddrSize);
+		byteSize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, (struct sockaddr*)_senderAddr, &sendAddrSize);
 #else
-	bytesize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, (struct sockaddr *)_senderAddr, &sendAddrSize);
+		byteSize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, (struct sockaddr*)_senderAddr, &sendAddrSize);
 #endif
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at Recvfrom():" << e.what() << std::endl;
+	}
 
-	return bytesize;
+	return byteSize;
 }
 
 int BaseSocket::Send(const char* _sendData, const int _sendDataSize)
 {
-	int result = 0;
+	int len = 0;
 	try {
-		result = send(m_socket, _sendData, _sendDataSize, 0);
+		len = send(m_socket, _sendData, _sendDataSize, 0);
 	}
 	catch (std::exception e) {
-		std::cerr << e.what() << std::endl;
+		std::cerr << "Exception Error at Send():" << e.what() << std::endl;
 	}
-	return result;
+	return len;
 }
 
 int BaseSocket::Send(const int _socket, const char* _sendData, const int _sendDataSize)
 {
-	int result = send(_socket, _sendData, _sendDataSize, 0);
-	return result;
+	int len = 0;
+	try {
+		len = send(_socket, _sendData, _sendDataSize, 0);
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at Send():" << e.what() << std::endl;
+	}
+	return len;
 }
 
 int BaseSocket::Sendto(const char* _sendData, const int _sendDataSize)
 {
-	int len = sendto(m_socket, _sendData, _sendDataSize, 0, result->ai_addr, result->ai_addrlen);
+	int len = 0;
+	try {
+		len = sendto(m_socket, _sendData, _sendDataSize, 0, result->ai_addr, result->ai_addrlen);
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at Sendto():" << e.what() << std::endl;
+	}
+
 	return len;
 }
 
 int BaseSocket::Sendto(const B_ADDRESS_IN* _addr, const char* _sendData, const int _sendDataSize)
 {
+	int len = 0;
+	try {
 #ifdef _MSC_VER
 	//int len = sendto(m_socket, _sendData, _sendDataSize, 0, _addr, sizeof(B_ADDRESS_IN));
-	int len = sendto(m_socket, _sendData, _sendDataSize, 0, (struct sockaddr*)_addr, sizeof(sockaddr));
+		len = sendto(m_socket, _sendData, _sendDataSize, 0, (struct sockaddr*)_addr, sizeof(sockaddr));
 #else
-	int len = sendto(m_socket, _sendData, _sendDataSize, 0, (struct sockaddr *)_addr, sizeof(sockaddr));
+		len = sendto(m_socket, _sendData, _sendDataSize, 0, (struct sockaddr *)_addr, sizeof(sockaddr));
 #endif
-
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at Sendto():" << e.what() << std::endl;
+	}
 	return len;
 }
 
 bool BaseSocket::Bind()
 {
-	if (bind(m_socket, result->ai_addr, result->ai_addrlen) != 0) {
+	try {
+		if (bind(m_socket, result->ai_addr, result->ai_addrlen) != 0) {
 
-		freeaddrinfo(result);																//メモリの解放
+			freeaddrinfo(result);																//メモリの解放
 #ifdef _MSC_VER
-		std::cerr << "Bind failed with error: " << WSAGetLastError() << std::endl;
-		closesocket(m_socket);
-		WSACleanup();
+			std::cerr << "Bind failed with error: " << WSAGetLastError() << std::endl;
+			closesocket(m_socket);
+			WSACleanup();
 #else
-		std::cerr << "Bind failed with error" << std::endl;
-		close(m_socket);
+			std::cerr << "Bind failed with error" << std::endl;
+			close(m_socket);
 #endif
+			return false;
+		}
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at Bind():" << e.what() << std::endl;
 		return false;
 	}
 	return true;
@@ -192,17 +233,24 @@ bool BaseSocket::Bind()
 
 bool BaseSocket::Listen()
 {
-	if (listen(m_socket, SOMAXCONN) != 0) {										//バックログのサイズを設定
+	try {
+		if (listen(m_socket, SOMAXCONN) != 0) {										//バックログのサイズを設定
 #ifdef _MSC_VER
-		std::cerr << "Listen failed with error: " << WSAGetLastError() << std::endl;
-		closesocket(m_socket);
-		WSACleanup();
+			std::cerr << "Listen failed with error: " << WSAGetLastError() << std::endl;
+			closesocket(m_socket);
+			WSACleanup();
 #else
-		std::cerr << "Listen failed with error" << std::endl;
-		close(m_socket);
+			std::cerr << "Listen failed with error" << std::endl;
+			close(m_socket);
 #endif
+			return false;
+		}
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at Listen():" << e.what() << std::endl;
 		return false;
 	}
+
 	return true;
 }
 
@@ -213,7 +261,14 @@ std::shared_ptr<BaseSocket> BaseSocket::Accept()
 	//accept処理
 	B_SOCKET recvSocket;
 	B_ADDRESS_LEN len = sizeof(addr);
-	recvSocket = accept(m_socket, &addr, &len);
+	try {
+		recvSocket = accept(m_socket, &addr, &len);
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at Accept():" << e.what() << std::endl;
+		return nullptr;
+	}
+
 
 #ifdef _MSC_VER
 	if (recvSocket == INVALID_SOCKET) return nullptr;
@@ -227,7 +282,15 @@ std::shared_ptr<BaseSocket> BaseSocket::Accept()
 
 bool BaseSocket::Connect()
 {
-	int error = connect(m_socket, result->ai_addr, result->ai_addrlen);
+	int error = 0;
+	try {
+		error = connect(m_socket, result->ai_addr, result->ai_addrlen);
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at Connect():" << e.what() << std::endl;
+		return false;
+	}
+
 	if (error != 0) {
 			freeaddrinfo(result);																//メモリの解放
 #ifdef _MSC_VER

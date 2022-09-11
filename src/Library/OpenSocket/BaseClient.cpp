@@ -51,11 +51,18 @@ int TCP_Client::SendServer(const char * _buf, const int _bufSize)
 	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
 
-	//ヘッダーを付加し送信
-	memcpy(sendBuf, &_bufSize, sizeof(int));
-	memcpy(&sendBuf[sizeof(int)], _buf, _bufSize);
+	try {
+		//ヘッダーを付加し送信
+		memcpy(sendBuf, &_bufSize, sizeof(int));
+		memcpy(&sendBuf[sizeof(int)], _buf, _bufSize);
 
-	sendDataSize = m_socket->Send(sendBuf, _bufSize + sizeof(int));
+		sendDataSize = m_socket->Send(sendBuf, _bufSize + sizeof(int));
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at TCP_Client::SendServer():" << e.what() << std::endl;
+		return sendDataSize;
+	}
+
 	return sendDataSize;
 }
 
@@ -92,20 +99,25 @@ std::vector<char> UDP_Client::GetRecvData()
 
 int UDP_Client::SendServer(const char * _buf, const int _bufSize)
 {
-	//int sendDataSize = 0;
+	int sendDataSize = 0;
 	char sendBuf[TCP_BUFFERSIZE];
 
-	//ヘッダーを付加し送信
-	memcpy(&sendBuf[0], &sequence, sizeof(unsigned int));
-	memcpy(&sendBuf[sizeof(unsigned int)], &_buf[0], _bufSize);
+	try {
+		//ヘッダーを付加し送信
+		memcpy(&sendBuf[0], &sequence, sizeof(unsigned int));
+		memcpy(&sendBuf[sizeof(unsigned int)], &_buf[0], _bufSize);
 
-	//送信処理
-	int len = m_socket->Sendto(&sendBuf[0], _bufSize + sizeof(unsigned int));
+		//送信処理
+		sendDataSize = m_socket->Sendto(&sendBuf[0], _bufSize + sizeof(unsigned int));
 
-	//シーケンス番号管理
-	sequence++;
-	if (sequence > SEQUENCEMAX) { sequence = 0; }
-
-	return len;
+		//シーケンス番号管理
+		sequence++;
+		if (sequence > SEQUENCEMAX) { sequence = 0; }
+	}
+	catch (std::exception e) {
+		std::cerr << "Exception Error at TCP_Client::SendServer():" << e.what() << std::endl;
+		return sendDataSize;
+	}
+	return sendDataSize;
 }
 
