@@ -1,5 +1,5 @@
-﻿#include"OpenSocket_STD.h"
-#include"OpenSocket_Def.h"
+﻿#include"../OpenSocket_STD.h"
+#include"../OpenSocket_Def.h"
 #include"BaseSocket.h"
 
 void BaseSocket::Init(const std::string _addrs, const std::string _port)

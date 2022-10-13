@@ -1,11 +1,8 @@
-ï»¿#include"OpenSocket_STD.h"
+#include"OpenSocket_STD.h"
 #include"OpenSocket_Def.h"
-#include"BaseSocket.h"
-#include"BaseRoutine.h"
-
-//===============================================================
-//Class TCP_Routine
-//===============================================================
+#include"base/BaseSocket.h"
+#include"base/BaseRoutine.h"
+#include"TCP_Routine.h"
 
 void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<char>& _recvData, std::queue<std::vector<char>>& _recvDataQueList)
 {
@@ -13,7 +10,7 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 	int dataSize = _socket->Recv(buf, TCP_BUFFERSIZE);
 
 	if (dataSize > 0) {
-		//å—ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´
+		//óMƒf[ƒ^‚ğŠi”[
 		int nowSize = _recvData.size();
 		_recvData.resize(nowSize + dataSize);
 		memcpy((char*)&_recvData[nowSize], &buf[0], dataSize);
@@ -21,12 +18,12 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 		while (_recvData.size() > sizeof(int)) {
 			int dataSize;
 			try {
-				//å…ˆé ­ãƒ‘ã‚±ãƒƒãƒˆã®è§£æ
+				//æ“ªƒpƒPƒbƒg‚Ì‰ğÍ
 				memcpy(&dataSize, &_recvData[0], sizeof(int));
 
-				//å…ˆé ­ãƒ‘ã‚±ãƒƒãƒˆãŒæƒ³å®šã—ã¦ã„ã‚‹ã‚ˆã‚Šã‚‚å°ã•ã„ã¾ãŸã¯å¤§ãã„ãƒ‘ã‚±ãƒƒãƒˆã®å ´åˆã¯ä¸æ­£ãƒ‘ã‚±ãƒƒãƒˆã¨ã—ã¦è§£é‡ˆã™ã‚‹ã€‚
+				//æ“ªƒpƒPƒbƒg‚ª‘z’è‚µ‚Ä‚¢‚é‚æ‚è‚à¬‚³‚¢‚Ü‚½‚Í‘å‚«‚¢ƒpƒPƒbƒg‚Ìê‡‚Í•s³ƒpƒPƒbƒg‚Æ‚µ‚Ä‰ğß‚·‚éB
 				if (dataSize < 0 || dataSize > RECVPACKETMAXSIZE) {
-					//TODO:ä¸æ­£ãƒ‘ã‚±ãƒƒãƒˆã¨ã¿ãªã—ãŸå ´åˆãƒ‘ã‚±ãƒƒãƒˆã‚’ã™ã¹ã¦å‰Šé™¤ã—ã¦ã„ã‚‹ãŒä½•ã‹ã„ã„æ‰‹ãŒãªã„ã‹è€ƒãˆã‚‹
+					//TODO:•s³ƒpƒPƒbƒg‚Æ‚İ‚È‚µ‚½ê‡ƒpƒPƒbƒg‚ğ‚·‚×‚Äíœ‚µ‚Ä‚¢‚é‚ª‰½‚©‚¢‚¢è‚ª‚È‚¢‚©l‚¦‚é
 					_recvData.clear();
 					return;
 				}
@@ -34,13 +31,13 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 			catch (std::exception e) {
 				std::cerr << "Exception Error at TCP_Routine::Update():" << e.what() << std::endl;
 
-				//TODO:ä¸æ­£ãƒ‘ã‚±ãƒƒãƒˆãªã©ã§å…ˆé ­ãƒ‡ãƒ¼ã‚¿ãŒintã§memcpyã§ããªã‹ã£ãŸéš›ã¯ãƒ‘ã‚±ãƒƒãƒˆã‚’ã™ã¹ã¦å‰Šé™¤ã—ã¦ã„ã‚‹ãŒä½•ã‹ã„ã„æ‰‹ãŒãªã„ã‹è€ƒãˆã‚‹
+				//TODO:•s³ƒpƒPƒbƒg‚È‚Ç‚Åæ“ªƒf[ƒ^‚ªint‚Åmemcpy‚Å‚«‚È‚©‚Á‚½Û‚ÍƒpƒPƒbƒg‚ğ‚·‚×‚Äíœ‚µ‚Ä‚¢‚é‚ª‰½‚©‚¢‚¢è‚ª‚È‚¢‚©l‚¦‚é
 				_recvData.clear();
 				return;
 			}
 
 
-			//å—ä¿¡ãƒ‡ãƒ¼ã‚¿ãŒä¸€å¡Šåˆ†ã‚ã‚Œã°ã‚­ãƒ¥ãƒ¼ã«è¿½åŠ 
+			//óMƒf[ƒ^‚ªˆê‰ò•ª‚ ‚ê‚ÎƒLƒ…[‚É’Ç‰Á
 			if (_recvData.size() > dataSize) {
 				std::vector<char> addData;
 				addData.resize(dataSize);
@@ -51,26 +48,26 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 		}
 	}
 	else if (dataSize == 0) {
-		//æ¥ç¶šã‚’çµ‚äº†ã™ã‚‹ã¨ã
+		//Ú‘±‚ğI—¹‚·‚é‚Æ‚«
 		std::cout << "connection is lost" << std::endl;
 	}
 #ifdef _MSC_VER
 	else if (WSAGetLastError() == WSAEWOULDBLOCK) {
-		//clientãŒsendã—ã¦ã„ãªã‹ã£ãŸã¨ãã«ãŠã“ã‚‹ã‚¨ãƒ©ãƒ¼(returnã§è‰¯ã„ã‹ã‚‚)
+		//client‚ªsend‚µ‚Ä‚¢‚È‚©‚Á‚½‚Æ‚«‚É‚¨‚±‚éƒGƒ‰[(return‚Å—Ç‚¢‚©‚à)
 	}
 #endif
 	else {
 #ifdef _MSC_VER
-		//æ¥ç¶šã‚¨ãƒ©ãƒ¼ãŒèµ·ã“ã£ãŸæ™‚
+		//Ú‘±ƒGƒ‰[‚ª‹N‚±‚Á‚½
 		std::cerr << "recv failed:" << WSAGetLastError() << std::endl;
 #else
 		if (errno == EAGAIN)
 		{
-			//éåŒæœŸã ã¨ã“ã“ã‚’åŸºæœ¬ã¯é€šã‚‹
+			//”ñ“¯Šú‚¾‚Æ‚±‚±‚ğŠî–{‚Í’Ê‚é
 			return;
 		}
 
-		//æ¥ç¶šã‚¨ãƒ©ãƒ¼ãŒèµ·ã“ã£ãŸæ™‚
+		//Ú‘±ƒGƒ‰[‚ª‹N‚±‚Á‚½
 		std::cerr << "recv failed" << std::endl;
 
 #endif
@@ -86,37 +83,37 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 		char buf[TCP_BUFFERSIZE];
 		int socket = _clientList.at(i)->GetSocket();
 
-		//ãƒ‡ãƒ¼ã‚¿ã‚’å—ä¿¡ã—ãŸéš›ã¯ãã®ãƒã‚¤ãƒˆæ•°ãŒåˆ‡æ–­ã•ã‚ŒãŸå ´åˆã¯0,ãƒãƒ³ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰ã§ãƒ‡ãƒ¼ã‚¿ã‚’å—ä¿¡ã—ã¦ãªã„é–“ã¯-1ãŒdataSizeã«å…¥ã‚‹
+		//ƒf[ƒ^‚ğóM‚µ‚½Û‚Í‚»‚ÌƒoƒCƒg”‚ªØ’f‚³‚ê‚½ê‡‚Í0,ƒmƒ“ƒuƒƒbƒLƒ“ƒOƒ‚[ƒh‚Åƒf[ƒ^‚ğóM‚µ‚Ä‚È‚¢ŠÔ‚Í-1‚ªdataSize‚É“ü‚é
 		int dataSize = _clientList.at(i)->Recv(buf, TCP_BUFFERSIZE);
 
 		if (dataSize > 0) {
 
-			//å—ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´
+			//óMƒf[ƒ^‚ğŠi”[
 			int nowSize = _recvDataMap[socket].size();
 			_recvDataMap[socket].resize(nowSize + dataSize);
 			memcpy((char*)&_recvDataMap[socket][nowSize], &buf[0], dataSize);
 
 			while (_recvDataMap[socket].size() > sizeof(int)) {
 
-				int dataSize=0;
+				int dataSize = 0;
 				try {
 					memcpy(&dataSize, &_recvDataMap[(B_SOCKET)socket][0], sizeof(int));
 
-					//å…ˆé ­ãƒ‘ã‚±ãƒƒãƒˆãŒæƒ³å®šã—ã¦ã„ã‚‹ã‚ˆã‚Šã‚‚å°ã•ã„ã¾ãŸã¯å¤§ãã„ãƒ‘ã‚±ãƒƒãƒˆã®å ´åˆã¯ä¸æ­£ãƒ‘ã‚±ãƒƒãƒˆã¨ã—ã¦è§£é‡ˆã™ã‚‹ã€‚
+					//æ“ªƒpƒPƒbƒg‚ª‘z’è‚µ‚Ä‚¢‚é‚æ‚è‚à¬‚³‚¢‚Ü‚½‚Í‘å‚«‚¢ƒpƒPƒbƒg‚Ìê‡‚Í•s³ƒpƒPƒbƒg‚Æ‚µ‚Ä‰ğß‚·‚éB
 					if (dataSize < 0 || dataSize > RECVPACKETMAXSIZE) {
-						//TODO:ä¸æ­£ãƒ‘ã‚±ãƒƒãƒˆã¨ã¿ãªã—ãŸå ´åˆãƒ‘ã‚±ãƒƒãƒˆã‚’ã™ã¹ã¦å‰Šé™¤ã—ã¦ã„ã‚‹ãŒä½•ã‹ã„ã„æ‰‹ãŒãªã„ã‹è€ƒãˆã‚‹
+						//TODO •s³ƒpƒPƒbƒg‚Æ‚İ‚È‚µ‚½ê‡ƒpƒPƒbƒg‚ğ‚·‚×‚Äíœ‚µ‚Ä‚¢‚é‚ª‰½‚©‚¢‚¢è‚ª‚È‚¢‚©l‚¦‚é
 						_recvDataMap[(B_SOCKET)socket].clear();
 					}
 				}
 				catch (std::exception e) {
 					std::cerr << "Exception Error at TCP_Routine::Update():" << e.what() << std::endl;
 
-					//TODO:ä¸æ­£ãƒ‘ã‚±ãƒƒãƒˆãªã©ã§å…ˆé ­ãƒ‡ãƒ¼ã‚¿ãŒintã§memcpyã§ããªã‹ã£ãŸéš›ã¯ãƒ‘ã‚±ãƒƒãƒˆã‚’ã™ã¹ã¦å‰Šé™¤ã—ã¦ã„ã‚‹ãŒä½•ã‹ã„ã„æ‰‹ãŒãªã„ã‹è€ƒãˆã‚‹
+					//TODO:•s³ƒpƒPƒbƒg‚È‚Ç‚Åæ“ªƒf[ƒ^‚ªint‚Åmemcpy‚Å‚«‚È‚©‚Á‚½Û‚ÍƒpƒPƒbƒg‚ğ‚·‚×‚Äíœ‚µ‚Ä‚¢‚é‚ª‰½‚©‚¢‚¢è‚ª‚È‚¢‚©l‚¦‚é
 					_recvDataMap[(B_SOCKET)socket].clear();
 					return;
 				}
 
-				//å—ä¿¡ãƒ‡ãƒ¼ã‚¿ãŒä¸€å¡Šåˆ†ã‚ã‚Œã°ã‚­ãƒ¥ãƒ¼ãƒªã‚¹ãƒˆã«è¿½åŠ 
+				//óMƒf[ƒ^‚ªˆê‰ò•ª‚ ‚ê‚ÎƒLƒ…[ƒŠƒXƒg‚É’Ç‰Á
 				if (_recvDataMap[socket].size() > dataSize) {
 					std::pair<B_SOCKET, std::vector<char>> addData;
 					addData.first = socket;
@@ -129,26 +126,26 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 
 		}
 		else if (dataSize == 0) {
-			//æ¥ç¶šã‚’çµ‚äº†ã™ã‚‹ã¨ã
+			//Ú‘±‚ğI—¹‚·‚é‚Æ‚«
 			std::cout << "connection is lost" << std::endl;
 			deleteList.push_back(i);
 		}
 #ifdef _MSC_VER
 		else if (WSAGetLastError() == WSAEWOULDBLOCK) {
-			//clientãŒsendã—ã¦ã„ãªã‹ã£ãŸã¨ãã«ãŠã“ã‚‹ã‚¨ãƒ©ãƒ¼
+			//client‚ªsend‚µ‚Ä‚¢‚È‚©‚Á‚½‚Æ‚«‚É‚¨‚±‚éƒGƒ‰[
 		}
 #endif
 		else {
 #ifdef _MSC_VER
 
-			//æ¥ç¶šã‚¨ãƒ©ãƒ¼ãŒèµ·ã“ã£ãŸæ™‚
+			//Ú‘±ƒGƒ‰[‚ª‹N‚±‚Á‚½
 			std::cerr << "recv failed:" << WSAGetLastError() << std::endl;
 			deleteList.push_back(i);
 #else
-			//errnoã¯ã‚·ã‚¹ãƒ†ãƒ ã‚³ãƒ¼ãƒ«ã‚„æ¨™æº–ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã®ã‚¨ãƒ©ãƒ¼ãŒæ ¼ç´ã•ã‚Œã‚‹å¤‰æ•°
+			//errno‚ÍƒVƒXƒeƒ€ƒR[ƒ‹‚â•W€ƒ‰ƒCƒuƒ‰ƒŠ‚ÌƒGƒ‰[‚ªŠi”[‚³‚ê‚é•Ï”
 			if (errno == EAGAIN)
 			{
-				//éåŒæœŸã ã¨ã“ã“ã‚’é€šã‚‹ã“ã¨ãŒã‚ã‚‹ãŒç„¡è¦–ã—ã¦è‰¯ã„
+				//”ñ“¯Šú‚¾‚Æ‚±‚±‚ğ’Ê‚é‚±‚Æ‚ª‚ ‚é‚ª–³‹‚µ‚Ä—Ç‚¢
 				break;
 			}
 
@@ -157,12 +154,12 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 			}
 			if (errno == ECONNRESET)
 			{
-				//ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆæ¥ç¶šãƒªã‚»ãƒƒãƒˆ
+				//ƒNƒ‰ƒCƒAƒ“ƒgÚ‘±ƒŠƒZƒbƒg
 				std::cout << "connection is lost" << std::endl;
 				deleteList.push_back(i);
 				break;
 			}
-			//æ¥ç¶šã‚¨ãƒ©ãƒ¼ãŒèµ·ã“ã£ãŸæ™‚
+			//Ú‘±ƒGƒ‰[‚ª‹N‚±‚Á‚½
 			std::cerr << "recv failed:" << errno << std::endl;
 			deleteList.push_back(i);
 #endif
@@ -170,9 +167,9 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 		}
 	}
 
-	//åˆ‡æ–­ã•ã‚ŒãŸã‚½ã‚±ãƒƒãƒˆå‡¦ç†
+	//Ø’f‚³‚ê‚½ƒ\ƒPƒbƒgˆ—
 	for (auto element : deleteList) {
-		//å—ä¿¡ãƒ‡ãƒ¼ã‚¿å‰Šé™¤
+		//óMƒf[ƒ^íœ
 		int socket = _clientList.at(element)->GetSocket();
 
 #ifdef _MSC_VER
@@ -181,28 +178,10 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 		_recvDataMap.erase(socket);
 #endif
 
-		//ã‚½ã‚±ãƒƒãƒˆå‰Šé™¤
+		//ƒ\ƒPƒbƒgíœ
 		_clientList.erase(_clientList.begin() + element);
 
 	}
 
 
-}
-
-//===============================================================
-//Class UDP_Routine
-//===============================================================
-void UDP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::queue<std::pair<B_ADDRESS_IN, std::vector<char>>>& _recvDataQueList)
-{
-	std::pair<B_ADDRESS_IN, std::vector<char>> addData;
-	char buf[TCP_BUFFERSIZE];
-
-	//å—ä¿¡å‡¦ç†
-	int dataSize = _socket->Recvfrom(&addData.first, &buf[0], TCP_BUFFERSIZE, 0);
-
-	if (dataSize > 0) {
-		addData.second.resize(dataSize);
-		memcpy(&addData.second[0], &buf[0], dataSize);
-		_recvDataQueList.push(addData);
-	}
 }

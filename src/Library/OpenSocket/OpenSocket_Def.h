@@ -8,7 +8,7 @@
 //#define TCP_BUFFERSIZE 1048576
 #define TCP_BUFFERSIZE 2048
 
-
+//TODO 型部分についてはtypedefに書き換え予定
 #ifdef _MSC_VER
 #define B_SOCKET SOCKET
 #define B_INIT_SOCKET INVALID_SOCKET
