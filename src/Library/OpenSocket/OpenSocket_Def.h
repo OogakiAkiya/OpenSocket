@@ -2,7 +2,10 @@
 #define IPV6 2
 #define IPVD 3
 #define SEQUENCEMAX 4200000000
-#define RECVPACKETMAXSIZE 1000000
+//#define RECVPACKETMAXSIZE 1000000
+#define ENDMARKER u8"\r\n"
+#define ENDMARKERSIZE strlen(ENDMARKER)
+#define TCP_HEADERSIZE sizeof(int)
 
 //�o�b�t�@�T�C�Y��1Mbyte
 //#define TCP_BUFFERSIZE 1048576

@@ -43,11 +43,15 @@ int TCP_Client::SendServer(const char* _buf, const int _bufSize)
 	char sendBuf[TCP_BUFFERSIZE];
 
 	try {
-		//ヘッダーを付加し送信
-		memcpy(sendBuf, &_bufSize, sizeof(int));
-		memcpy(&sendBuf[sizeof(int)], _buf, _bufSize);
+		//ヘッダーを付加
+		memcpy(sendBuf, &_bufSize, TCP_HEADERSIZE);
+		memcpy(&sendBuf[TCP_HEADERSIZE], _buf, _bufSize);
 
-		sendDataSize = m_socket->Send(sendBuf, _bufSize + sizeof(int));
+		//エンドマーカーを付与
+		memcpy(&sendBuf[TCP_HEADERSIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
+
+		//送信
+		sendDataSize = m_socket->Send(sendBuf, _bufSize + TCP_HEADERSIZE + ENDMARKERSIZE);
 	}
 	catch (std::exception e) {
 		std::cerr << "Exception Error at TCP_Client::SendServer():" << e.what() << std::endl;

@@ -22,11 +22,19 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 				memcpy(&dataSize, &_recvData[0], sizeof(int));
 
 				//先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
-				if (dataSize < 0 || dataSize > RECVPACKETMAXSIZE) {
+				if (dataSize < 0 || dataSize > TCP_BUFFERSIZE - sizeof(int) - ENDMARKERSIZE) {
 					//TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
 					_recvData.clear();
 					return;
 				}
+
+				//エンドマーカーの値が正常値かチェック
+				if (memcmp(&_recvData[dataSize + sizeof(int)], &ENDMARKER, ENDMARKERSIZE) != 0) {
+					//TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
+					_recvData.clear();
+					return;
+				}
+
 			}
 			catch (std::exception e) {
 				std::cerr << "Exception Error at TCP_Routine::Update():" << e.what() << std::endl;
@@ -36,14 +44,13 @@ void TCP_Routine::Update(const std::shared_ptr<BaseSocket> _socket, std::vector<
 				return;
 			}
 
-
 			//受信データが一塊分あればキューに追加
 			if (_recvData.size() > dataSize) {
 				std::vector<char> addData;
 				addData.resize(dataSize);
 				memcpy(&addData[0], &_recvData[sizeof(int)], dataSize);
 				_recvDataQueList.push(addData);
-				_recvData.erase(_recvData.begin(), _recvData.begin() + dataSize + sizeof(int));
+				_recvData.erase(_recvData.begin(), _recvData.begin() + dataSize + sizeof(int) + ENDMARKERSIZE);
 			}
 		}
 	}
@@ -83,7 +90,7 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 		char buf[TCP_BUFFERSIZE];
 		int socket = _clientList.at(i)->GetSocket();
 
-		//データを受信した際はそのバイト数が切断された場合は0,ノンブロッキングモードでデータを受信してない間は-1がdataSizeに入る
+		//データを受信した際はそのバイト数が入り切断された場合は0,ノンブロッキングモードでデータを受信してない間は-1がdataSizeに入る
 		int dataSize = _clientList.at(i)->Recv(buf, TCP_BUFFERSIZE);
 
 		if (dataSize > 0) {
@@ -100,9 +107,17 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 					memcpy(&dataSize, &_recvDataMap[(B_SOCKET)socket][0], sizeof(int));
 
 					//先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
-					if (dataSize < 0 || dataSize > RECVPACKETMAXSIZE) {
+					if (dataSize < 0 || dataSize > TCP_BUFFERSIZE - sizeof(int) - ENDMARKERSIZE) {
 						//TODO 不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
 						_recvDataMap[(B_SOCKET)socket].clear();
+						return;
+					}
+
+					//エンドマーカーの値が正常値かチェック
+					if (memcmp(&_recvDataMap[(B_SOCKET)socket][dataSize + sizeof(int)], &ENDMARKER, ENDMARKERSIZE) != 0) {
+						//TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
+						_recvDataMap[(B_SOCKET)socket].clear();
+						return;
 					}
 				}
 				catch (std::exception e) {
@@ -120,7 +135,7 @@ void TCP_Routine::Update(std::vector<std::shared_ptr<BaseSocket>>& _clientList, 
 					addData.second.resize(dataSize);
 					memcpy(&addData.second[0], &_recvDataMap[socket][sizeof(int)], dataSize);
 					_recvDataQueList.push(addData);
-					_recvDataMap[socket].erase(_recvDataMap[socket].begin(), _recvDataMap[socket].begin() + dataSize + sizeof(int));
+					_recvDataMap[socket].erase(_recvDataMap[socket].begin(), _recvDataMap[socket].begin() + dataSize + sizeof(int) + ENDMARKERSIZE);
 				}
 			}
 

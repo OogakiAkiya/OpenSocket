@@ -53,13 +53,15 @@ int TCP_Server::SendOnlyClient(const int _socket, const char* _buf, const int _b
 	char sendBuf[TCP_BUFFERSIZE];
 
 	try {
-		//ヘッダーを付加し送信
-		memcpy(sendBuf, &_bufSize, sizeof(int));
-		memcpy(&sendBuf[sizeof(int)], _buf, _bufSize);
+		//ヘッダーを付加
+		memcpy(sendBuf, &_bufSize, TCP_HEADERSIZE);
+		memcpy(&sendBuf[TCP_HEADERSIZE], _buf, _bufSize);
 
+		//エンドマーカーを付与
+		memcpy(&sendBuf[TCP_HEADERSIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
 		for (auto&& clients : clientList) {
-			if (clients->GetSocket() == _socket)sendDataSize = clients->Send(sendBuf, _bufSize + sizeof(int));
+			if (clients->GetSocket() == _socket)sendDataSize = clients->Send(sendBuf, _bufSize + TCP_HEADERSIZE + ENDMARKERSIZE);
 		}
 	}
 	catch (std::exception e) {
@@ -76,12 +78,15 @@ int TCP_Server::SendAllClient(const char* _buf, const int _bufSize)
 	char sendBuf[TCP_BUFFERSIZE];
 
 	try {
-		//ヘッダーを付加し送信
-		memcpy(sendBuf, &_bufSize, sizeof(int));
-		memcpy(&sendBuf[sizeof(int)], _buf, _bufSize);
+		//ヘッダーを付加
+		memcpy(sendBuf, &_bufSize, TCP_HEADERSIZE);
+		memcpy(&sendBuf[TCP_HEADERSIZE], _buf, _bufSize);
+
+		//エンドマーカーを付与
+		memcpy(&sendBuf[TCP_HEADERSIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
 		for (auto&& clients : clientList) {
-			sendDataSize = clients->Send(sendBuf, _bufSize + sizeof(int));
+			sendDataSize = clients->Send(sendBuf, _bufSize + TCP_HEADERSIZE + ENDMARKERSIZE);
 		}
 	}
 	catch (std::exception e) {
