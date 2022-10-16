@@ -15,3 +15,5 @@ windowsでnetstatで確認すると解放されていないのがわかる
 ```sh
 $ ip a show dev eth0
 ```
+## パケット図
+![TCP Base packet image](readme_img/tcp_basepacket.png)
