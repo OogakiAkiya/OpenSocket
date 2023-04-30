@@ -1,7 +1,7 @@
 ﻿#include "Library/OpenSocket/OpenSocket.h"
 int main() {
 	//=============================================================
-	//TCP Clientサンプル
+	//TCP Client非同期通信サンプル
 	//=============================================================
 	std::shared_ptr<BaseClient> client;
 	while (1) {

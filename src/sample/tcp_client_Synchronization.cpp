@@ -1,7 +1,7 @@
 ﻿#include "Library/OpenSocket/OpenSocket.h"
 int main() {
 	//=============================================================
-	//TCP Clientサンプル
+	//TCP Client同期通信サンプル
 	//=============================================================
 	fd_set readfds;
 	std::shared_ptr<BaseClient> client;
