@@ -14,6 +14,10 @@ public:
 	int SendMultiClient(const std::vector<B_ADDRESS_IN> _addrList, const char* _buf, const int _bufSize);
 
 private:
+	//メンバ関数
+	void DataProcessing();
+
+	//メンバ変数
 	unsigned int sequence = 0;																				//シーケンス番号
 	std::queue<std::pair<B_ADDRESS_IN, std::vector<char>>> recvDataQueList;									//クライアントから受信した情報が入る
 

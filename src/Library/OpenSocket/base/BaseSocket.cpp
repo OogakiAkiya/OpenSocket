@@ -96,7 +96,7 @@ bool BaseSocket::AddressSet()
 			return false;
 		}
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at AddressSet():" << e.what() << std::endl;
 		return false;
 	}
@@ -120,12 +120,11 @@ void BaseSocket::Close()
 
 int BaseSocket::Recv(char* _recvbuf, int recvbuf_size, const int flg)
 {
-	if (this == nullptr)return 0;
 	int byteSize = 0;
 	try {
 		byteSize = recv(m_socket, _recvbuf, recvbuf_size, 0);
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at Recv():" << e.what() << std::endl;
 	}
 
@@ -146,7 +145,7 @@ int BaseSocket::Recvfrom(B_ADDRESS_IN* _senderAddr, char* _recvbuf, int recvbuf_
 		byteSize = recvfrom(m_socket, _recvbuf, recvbuf_size, 0, (struct sockaddr*)_senderAddr, &sendAddrSize);
 #endif
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at Recvfrom():" << e.what() << std::endl;
 	}
 
@@ -159,7 +158,7 @@ int BaseSocket::Send(const char* _sendData, const int _sendDataSize)
 	try {
 		len = send(m_socket, _sendData, _sendDataSize, 0);
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at Send():" << e.what() << std::endl;
 	}
 	return len;
@@ -171,7 +170,7 @@ int BaseSocket::Send(const int _socket, const char* _sendData, const int _sendDa
 	try {
 		len = send(_socket, _sendData, _sendDataSize, 0);
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at Send():" << e.what() << std::endl;
 	}
 	return len;
@@ -183,7 +182,7 @@ int BaseSocket::Sendto(const char* _sendData, const int _sendDataSize)
 	try {
 		len = sendto(m_socket, _sendData, _sendDataSize, 0, result->ai_addr, result->ai_addrlen);
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at Sendto():" << e.what() << std::endl;
 	}
 
@@ -201,7 +200,7 @@ int BaseSocket::Sendto(const B_ADDRESS_IN* _addr, const char* _sendData, const i
 		len = sendto(m_socket, _sendData, _sendDataSize, 0, (struct sockaddr *)_addr, sizeof(sockaddr));
 #endif
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at Sendto():" << e.what() << std::endl;
 	}
 	return len;
@@ -224,7 +223,7 @@ bool BaseSocket::Bind()
 			return false;
 		}
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at Bind():" << e.what() << std::endl;
 		return false;
 	}
@@ -246,7 +245,7 @@ bool BaseSocket::Listen()
 			return false;
 		}
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at Listen():" << e.what() << std::endl;
 		return false;
 	}
@@ -264,7 +263,7 @@ std::shared_ptr<BaseSocket> BaseSocket::Accept()
 	try {
 		recvSocket = accept(m_socket, &addr, &len);
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at Accept():" << e.what() << std::endl;
 		return nullptr;
 	}
@@ -286,7 +285,7 @@ bool BaseSocket::Connect()
 	try {
 		error = connect(m_socket, result->ai_addr, result->ai_addrlen);
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at Connect():" << e.what() << std::endl;
 		return false;
 	}

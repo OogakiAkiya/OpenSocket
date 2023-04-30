@@ -1,9 +1,7 @@
 #include"OpenSocket_STD.h"
 #include"OpenSocket_Def.h"
 #include"base/BaseSocket.h"
-#include"base/BaseRoutine.h"
 #include"base/BaseServer.h"
-#include"UDP_Routine.h"
 #include"UDP_Server.h"
 
 std::shared_ptr<UDP_Server> UDP_Server::GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous)
@@ -11,7 +9,6 @@ std::shared_ptr<UDP_Server> UDP_Server::GetInstance(const std::string _addrs, co
 	std::shared_ptr<UDP_Server> temp = std::make_shared<UDP_Server>();
 
 	temp->m_socket = std::make_shared<BaseSocket>();
-	temp->m_routine = std::make_shared<UDP_Routine>();
 	temp->m_socket->Init(_addrs, _port);
 	SwitchIpv(temp->m_socket, _ipv);
 	temp->m_socket->SetProtocol_UDP();
@@ -24,7 +21,7 @@ std::shared_ptr<UDP_Server> UDP_Server::GetInstance(const std::string _addrs, co
 
 void UDP_Server::Update()
 {
-	m_routine->Update(m_socket, recvDataQueList);
+	DataProcessing();
 }
 
 int UDP_Server::GetRecvDataSize()
@@ -49,7 +46,7 @@ int UDP_Server::SendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, cons
 		sequence++;
 		if (sequence > SEQUENCEMAX) { sequence = 0; }
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at UDP_Server::SendOnlyClient():" << e.what() << std::endl;
 		return sendDataSize;
 	}
@@ -76,12 +73,34 @@ int UDP_Server::SendMultiClient(const std::vector<B_ADDRESS_IN> _addrList, const
 		sequence++;
 		if (sequence > SEQUENCEMAX) { sequence = 0; }
 	}
-	catch (std::exception e) {
+	catch (const std::exception& e) {
 		std::cerr << "Exception Error at UDP_Server::SendMultiClient():" << e.what() << std::endl;
 		return 0;
 	}
 
 	return sendDataSize;
+}
+
+void UDP_Server::DataProcessing()
+{
+	//ファイルディスクリプタが設定されておりビットフラグが立っていない場合抜けるようにする
+	if (fds != nullptr) {
+		if (!FD_ISSET(m_socket->GetSocket(), fds)) {
+			return;
+		}
+	}
+
+	std::pair<B_ADDRESS_IN, std::vector<char>> addData;
+	char buf[TCP_BUFFERSIZE];
+
+	//受信処理
+	int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], TCP_BUFFERSIZE, 0);
+	if (dataSize > 0) {
+		addData.second.resize(dataSize);
+		memcpy(&addData.second[0], &buf[0], dataSize);
+		recvDataQueList.push(addData);
+	}
+
 }
 
 std::pair<B_ADDRESS_IN, std::vector<char>> UDP_Server::GetRecvData()

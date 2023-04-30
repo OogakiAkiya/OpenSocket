@@ -13,8 +13,12 @@ public:
 	virtual int SendServer(const char* _buf, const int _bufSize)override;				//特定のサーバーに送信する場合使用する
 
 private:
+	//メンバ関数
+	void DataProcessing();
+
+	//メンバ変数
 	unsigned int sequence = 0;															//シーケンス番号
-	std::queue<std::pair<B_ADDRESS_IN, std::vector<char>>> recvDataQueList;					//クライアントから受信した情報が入る
+	std::queue<std::pair<B_ADDRESS_IN, std::vector<char>>> recvDataQueList;				//クライアントから受信した情報が入る
 
 };
 

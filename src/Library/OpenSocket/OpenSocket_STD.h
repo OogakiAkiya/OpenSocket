@@ -12,7 +12,6 @@
 #include<math.h>
 #include<time.h>
 #include<stdlib.h>
-#include<algorithm>
 #include<thread>
 
 
@@ -30,12 +29,12 @@
 
 #endif
 #include<iostream>
-#include<stdio.h>
 #include<vector>
 #include<mutex>
 #include<string>
 #include<list>
 #include<queue>
 #include<unordered_map>
+#include <algorithm>
 
 #endif
