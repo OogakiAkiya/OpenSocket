@@ -2,9 +2,9 @@
 #define OPENSOCKET_UTILITY_h
 
 /**
-*  @brief ƒtƒ@ƒCƒ‹ƒfƒBƒXƒNƒŠƒvƒ^‚ðˆø”‚Æ‚µ‚Ä“n‚·‚±‚Æ‚ÅselectŠÖ”‚ðŽÀs‚·‚é
+*  @brief ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ã‚’å¼•æ•°ã¨ã—ã¦æ¸¡ã™ã“ã¨ã§selecté–¢æ•°ã‚’å®Ÿè¡Œã™ã‚‹
 * 
-*  @param _fds		select‚ÅŠÄŽ‹‚·‚éƒtƒ@ƒCƒ‹ƒfƒBƒXƒNƒŠƒvƒ^
+*  @param _fds		selectã§ç›£è¦–ã™ã‚‹ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿
 **/
 void OpenSocket_Select(fd_set* _fds, int _maxfds = -1);
 

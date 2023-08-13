@@ -7,19 +7,19 @@ public:
 	~UDP_Server() {}
 	static std::shared_ptr<UDP_Server> GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous = false);
 	virtual void Update() override;
-	virtual int GetRecvDataSize() override;																	//óMƒf[ƒ^‚Ì”‚ğæ“¾
-	std::pair<B_ADDRESS_IN, std::vector<char>> GetRecvData();												//ƒNƒ‰ƒCƒAƒ“ƒg‚©‚çóM‚µ‚½ƒf[ƒ^‚ğæ‚èo‚·
+	virtual int GetRecvDataSize() override;																	//å—ä¿¡ãƒ‡ãƒ¼ã‚¿ã®æ•°ã‚’å–å¾—
+	std::pair<B_ADDRESS_IN, std::vector<char>> GetRecvData();												//ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å–ã‚Šå‡ºã™
 
-	int SendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, const int _bufSize);						//“Á’è‚ÌƒNƒ‰ƒCƒAƒ“ƒg‚É‘—M‚·‚éê‡g—p‚·‚é
+	int SendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, const int _bufSize);						//ç‰¹å®šã®ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã«é€ä¿¡ã™ã‚‹å ´åˆä½¿ç”¨ã™ã‚‹
 	int SendMultiClient(const std::vector<B_ADDRESS_IN> _addrList, const char* _buf, const int _bufSize);
 
 private:
-	//ƒƒ“ƒoŠÖ”
+	//ãƒ¡ãƒ³ãƒé–¢æ•°
 	void DataProcessing();
 
-	//ƒƒ“ƒo•Ï”
-	unsigned int sequence = 0;																				//ƒV[ƒPƒ“ƒX”Ô†
-	std::queue<std::pair<B_ADDRESS_IN, std::vector<char>>> recvDataQueList;									//ƒNƒ‰ƒCƒAƒ“ƒg‚©‚çóM‚µ‚½î•ñ‚ª“ü‚é
+	//ãƒ¡ãƒ³ãƒå¤‰æ•°
+	unsigned int sequence = 0;																				//ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ç•ªå·
+	std::queue<std::pair<B_ADDRESS_IN, std::vector<char>>> recvDataQueList;									//ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰å—ä¿¡ã—ãŸæƒ…å ±ãŒå…¥ã‚‹
 
 };
 

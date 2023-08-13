@@ -21,14 +21,14 @@ std::shared_ptr<TCP_Server> TCP_Server::GetInstance(const std::string _addrs, co
 
 void TCP_Server::Update()
 {
-	//ƒtƒ@ƒCƒ‹ƒfƒBƒXƒNƒŠƒvƒ^‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢ê‡
+	//ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒè¨­å®šã•ã‚Œã¦ã„ãªã„å ´åˆ
 	if (fds == nullptr) {
 		AcceptProcessing();
 		if (clientList.size() > 0) DataProcessing();
 		return;
 	}
 
-	//ƒtƒ@ƒCƒ‹ƒfƒBƒXƒNƒŠƒvƒ^‚ªİ’è‚³‚ê‚Ä‚¢‚éê‡
+	//ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒè¨­å®šã•ã‚Œã¦ã„ã‚‹å ´åˆ
 	if (FD_ISSET(m_socket->GetSocket(), fds)) AcceptProcessing();
 	if (clientList.size() > 0) DataProcessing();
 }
@@ -55,11 +55,11 @@ int TCP_Server::SendOnlyClient(const int _socket, const char* _buf, const int _b
 	char sendBuf[TCP_BUFFERSIZE];
 
 	try {
-		//ƒwƒbƒ_[‚ğ•t‰Á
+		//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ 
 		memcpy(sendBuf, &_bufSize, TCP_HEADERSIZE);
 		memcpy(&sendBuf[TCP_HEADERSIZE], _buf, _bufSize);
 
-		//ƒGƒ“ƒhƒ}[ƒJ[‚ğ•t—^
+		//ã‚¨ãƒ³ãƒ‰ãƒãƒ¼ã‚«ãƒ¼ã‚’ä»˜ä¸
 		memcpy(&sendBuf[TCP_HEADERSIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
 		for (auto&& clients : clientList) {
@@ -80,11 +80,11 @@ int TCP_Server::SendAllClient(const char* _buf, const int _bufSize)
 	char sendBuf[TCP_BUFFERSIZE];
 
 	try {
-		//ƒwƒbƒ_[‚ğ•t‰Á
+		//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ 
 		memcpy(sendBuf, &_bufSize, TCP_HEADERSIZE);
 		memcpy(&sendBuf[TCP_HEADERSIZE], _buf, _bufSize);
 
-		//ƒGƒ“ƒhƒ}[ƒJ[‚ğ•t—^
+		//ã‚¨ãƒ³ãƒ‰ãƒãƒ¼ã‚«ãƒ¼ã‚’ä»˜ä¸
 		memcpy(&sendBuf[TCP_HEADERSIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
 		for (auto&& clients : clientList) {
@@ -107,35 +107,35 @@ void TCP_Server::AcceptProcessing()
 		clientList.push_back(client);
 		std::vector<char> recvDataList;
 
-		//Šù‘¶ƒ\ƒPƒbƒg‚Ì—L–³Šm”F
+		//æ—¢å­˜ã‚½ã‚±ãƒƒãƒˆã®æœ‰ç„¡ç¢ºèª
 		auto ite = recvDataMap.find(client->GetSocket());
 		if (ite != recvDataMap.end()) recvDataMap.erase(ite);
 
-		//ƒNƒ‰ƒCƒAƒ“ƒgì¬
+		//ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆä½œæˆ
 		recvDataMap.insert({ client->GetSocket(),recvDataList });
 	}
 }
 
 void TCP_Server::DataProcessing()
 {
-	//clietnList‚Ìindex,socket”Ô†‚Ì‡‚Å’l‚ğŠi”[
+	//clietnListã®index,socketç•ªå·ã®é †ã§å€¤ã‚’æ ¼ç´
 	std::list<std::pair<std::shared_ptr<BaseSocket>, int>> deleteList;
 
 	for (int i = 0; i < clientList.size(); i++) {
 		char buf[TCP_BUFFERSIZE];
 		int socket = clientList.at(i)->GetSocket();
 
-		//fds‚ªƒZƒbƒg‚³‚ê‚Ä‚¨‚èsocket‚ÉƒCƒxƒ“ƒg‚ª”­¶‚µ‚Ä‚¢‚é‚©Šm”F‚µA”­¶‚µ‚Ä‚¢‚È‚¯‚ê‚ÎƒXƒLƒbƒv
+		//fdsãŒã‚»ãƒƒãƒˆã•ã‚Œã¦ãŠã‚Šsocketã«ã‚¤ãƒ™ãƒ³ãƒˆãŒç™ºç”Ÿã—ã¦ã„ã‚‹ã‹ç¢ºèªã—ã€ç™ºç”Ÿã—ã¦ã„ãªã‘ã‚Œã°ã‚¹ã‚­ãƒƒãƒ—
 		if (fds) {
 			if (!FD_ISSET(socket, fds)) continue;
 		}
 
-		//ƒf[ƒ^‚ğóM‚µ‚½Û‚Í‚»‚ÌƒoƒCƒg”‚ª“ü‚èØ’f‚³‚ê‚½ê‡‚Í0,ƒmƒ“ƒuƒƒbƒLƒ“ƒOƒ‚[ƒh‚Åƒf[ƒ^‚ğóM‚µ‚Ä‚È‚¢ŠÔ‚Í-1‚ªdataSize‚É“ü‚é
+		//ãƒ‡ãƒ¼ã‚¿ã‚’å—ä¿¡ã—ãŸéš›ã¯ãã®ãƒã‚¤ãƒˆæ•°ãŒå…¥ã‚Šåˆ‡æ–­ã•ã‚ŒãŸå ´åˆã¯0,ãƒãƒ³ãƒ–ãƒ­ãƒƒã‚­ãƒ³ã‚°ãƒ¢ãƒ¼ãƒ‰ã§ãƒ‡ãƒ¼ã‚¿ã‚’å—ä¿¡ã—ã¦ãªã„é–“ã¯-1ãŒdataSizeã«å…¥ã‚‹
 		int dataSize = clientList.at(i)->Recv(buf, TCP_BUFFERSIZE);
 
 		if (dataSize > 0) {
 
-			//óMƒf[ƒ^‚ğŠi”[
+			//å—ä¿¡ãƒ‡ãƒ¼ã‚¿ã‚’æ ¼ç´
 			int nowSize = recvDataMap[socket].size();
 			recvDataMap[socket].resize(nowSize + dataSize);
 			memcpy((char*)&recvDataMap[socket][nowSize], &buf[0], dataSize);
@@ -146,16 +146,16 @@ void TCP_Server::DataProcessing()
 				try {
 					memcpy(&dataSize, &recvDataMap[(B_SOCKET)socket][0], sizeof(int));
 
-					//æ“ªƒpƒPƒbƒg‚ª‘z’è‚µ‚Ä‚¢‚é‚æ‚è‚à¬‚³‚¢‚Ü‚½‚Í‘å‚«‚¢ƒpƒPƒbƒg‚Ìê‡‚Í•s³ƒpƒPƒbƒg‚Æ‚µ‚Ä‰ğß‚·‚éB
+					//å…ˆé ­ãƒ‘ã‚±ãƒƒãƒˆãŒæƒ³å®šã—ã¦ã„ã‚‹ã‚ˆã‚Šã‚‚å°ã•ã„ã¾ãŸã¯å¤§ãã„ãƒ‘ã‚±ãƒƒãƒˆã®å ´åˆã¯ä¸æ­£ãƒ‘ã‚±ãƒƒãƒˆã¨ã—ã¦è§£é‡ˆã™ã‚‹ã€‚
 					if (dataSize < 0 || dataSize > TCP_BUFFERSIZE - sizeof(int) - ENDMARKERSIZE) {
-						//TODO •s³ƒpƒPƒbƒg‚Æ‚İ‚È‚µ‚½ê‡ƒpƒPƒbƒg‚ğ‚·‚×‚Äíœ‚µ‚Ä‚¢‚é‚ª‰½‚©‚¢‚¢è‚ª‚È‚¢‚©l‚¦‚é
+						//TODO ä¸æ­£ãƒ‘ã‚±ãƒƒãƒˆã¨ã¿ãªã—ãŸå ´åˆãƒ‘ã‚±ãƒƒãƒˆã‚’ã™ã¹ã¦å‰Šé™¤ã—ã¦ã„ã‚‹ãŒä½•ã‹ã„ã„æ‰‹ãŒãªã„ã‹è€ƒãˆã‚‹
 						recvDataMap[(B_SOCKET)socket].clear();
 						return;
 					}
 
-					//ƒGƒ“ƒhƒ}[ƒJ[‚Ì’l‚ª³í’l‚©ƒ`ƒFƒbƒN
+					//ã‚¨ãƒ³ãƒ‰ãƒãƒ¼ã‚«ãƒ¼ã®å€¤ãŒæ­£å¸¸å€¤ã‹ãƒã‚§ãƒƒã‚¯
 					if (memcmp(&recvDataMap[(B_SOCKET)socket][dataSize + sizeof(int)], &ENDMARKER, ENDMARKERSIZE) != 0) {
-						//TODO:•s³ƒpƒPƒbƒg‚Æ‚İ‚È‚µ‚½ê‡ƒpƒPƒbƒg‚ğ‚·‚×‚Äíœ‚µ‚Ä‚¢‚é‚ª‰½‚©‚¢‚¢è‚ª‚È‚¢‚©l‚¦‚é
+						//TODO:ä¸æ­£ãƒ‘ã‚±ãƒƒãƒˆã¨ã¿ãªã—ãŸå ´åˆãƒ‘ã‚±ãƒƒãƒˆã‚’ã™ã¹ã¦å‰Šé™¤ã—ã¦ã„ã‚‹ãŒä½•ã‹ã„ã„æ‰‹ãŒãªã„ã‹è€ƒãˆã‚‹
 						recvDataMap[(B_SOCKET)socket].clear();
 						return;
 					}
@@ -163,12 +163,12 @@ void TCP_Server::DataProcessing()
 				catch (const std::exception& e) {
 					std::cerr << "Exception Error at TCP_Server::DataProcessing:" << e.what() << std::endl;
 
-					//TODO:•s³ƒpƒPƒbƒg‚È‚Ç‚Åæ“ªƒf[ƒ^‚ªint‚Åmemcpy‚Å‚«‚È‚©‚Á‚½Û‚ÍƒpƒPƒbƒg‚ğ‚·‚×‚Äíœ‚µ‚Ä‚¢‚é‚ª‰½‚©‚¢‚¢è‚ª‚È‚¢‚©l‚¦‚é
+					//TODO:ä¸æ­£ãƒ‘ã‚±ãƒƒãƒˆãªã©ã§å…ˆé ­ãƒ‡ãƒ¼ã‚¿ãŒintã§memcpyã§ããªã‹ã£ãŸéš›ã¯ãƒ‘ã‚±ãƒƒãƒˆã‚’ã™ã¹ã¦å‰Šé™¤ã—ã¦ã„ã‚‹ãŒä½•ã‹ã„ã„æ‰‹ãŒãªã„ã‹è€ƒãˆã‚‹
 					recvDataMap[(B_SOCKET)socket].clear();
 					return;
 				}
 
-				//óMƒf[ƒ^‚ªˆê‰ò•ª‚ ‚ê‚ÎƒŒƒV[ƒuƒLƒ…[‚É’Ç‰Á
+				//å—ä¿¡ãƒ‡ãƒ¼ã‚¿ãŒä¸€å¡Šåˆ†ã‚ã‚Œã°ãƒ¬ã‚·ãƒ¼ãƒ–ã‚­ãƒ¥ãƒ¼ã«è¿½åŠ 
 				if (recvDataMap[socket].size() > dataSize) {
 					std::pair<B_SOCKET, std::vector<char>> addData;
 					addData.first = socket;
@@ -181,26 +181,26 @@ void TCP_Server::DataProcessing()
 
 		}
 		else if (dataSize == 0) {
-			//Ú‘±‚ğI—¹‚·‚é‚Æ‚«
+			//æ¥ç¶šã‚’çµ‚äº†ã™ã‚‹ã¨ã
 			std::cout << "connection is lost" << std::endl;
 			deleteList.push_back(std::make_pair(clientList.at(i),socket));
 		}
 #ifdef _MSC_VER
 		else if (WSAGetLastError() == WSAEWOULDBLOCK) {
-			//client‚ªsend‚µ‚Ä‚¢‚È‚©‚Á‚½‚Æ‚«‚É‚¨‚±‚éƒGƒ‰[
+			//clientãŒsendã—ã¦ã„ãªã‹ã£ãŸã¨ãã«ãŠã“ã‚‹ã‚¨ãƒ©ãƒ¼
 		}
 #endif
 		else {
 #ifdef _MSC_VER
 
-			//Ú‘±ƒGƒ‰[‚ª‹N‚±‚Á‚½
+			//æ¥ç¶šã‚¨ãƒ©ãƒ¼ãŒèµ·ã“ã£ãŸæ™‚
 			std::cerr << "recv failed:" << WSAGetLastError() << std::endl;
 			deleteList.push_back(std::make_pair(clientList.at(i), socket));
 #else
-			//errno‚ÍƒVƒXƒeƒ€ƒR[ƒ‹‚â•W€ƒ‰ƒCƒuƒ‰ƒŠ‚ÌƒGƒ‰[‚ªŠi”[‚³‚ê‚é•Ï”
+			//errnoã¯ã‚·ã‚¹ãƒ†ãƒ ã‚³ãƒ¼ãƒ«ã‚„æ¨™æº–ãƒ©ã‚¤ãƒ–ãƒ©ãƒªã®ã‚¨ãƒ©ãƒ¼ãŒæ ¼ç´ã•ã‚Œã‚‹å¤‰æ•°
 			if (errno == EAGAIN)
 			{
-				//”ñ“¯Šú‚¾‚Æ‚±‚±‚ğ’Ê‚é‚±‚Æ‚ª‚ ‚é‚ª–³‹‚µ‚Ä—Ç‚¢
+				//éåŒæœŸã ã¨ã“ã“ã‚’é€šã‚‹ã“ã¨ãŒã‚ã‚‹ãŒç„¡è¦–ã—ã¦è‰¯ã„
 				break;
 			}
 
@@ -209,12 +209,12 @@ void TCP_Server::DataProcessing()
 			}
 			if (errno == ECONNRESET)
 			{
-				//ƒNƒ‰ƒCƒAƒ“ƒgÚ‘±ƒŠƒZƒbƒg
+				//ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆæ¥ç¶šãƒªã‚»ãƒƒãƒˆ
 				std::cout << "connection is lost" << std::endl;
 				deleteList.push_back(std::make_pair(clientList.at(i), socket));
 				break;
 			}
-			//Ú‘±ƒGƒ‰[‚ª‹N‚±‚Á‚½
+			//æ¥ç¶šã‚¨ãƒ©ãƒ¼ãŒèµ·ã“ã£ãŸæ™‚
 			std::cerr << "recv failed:" << errno << std::endl;
 			deleteList.push_back(std::make_pair(clientList.at(i), socket));
 #endif
@@ -224,9 +224,9 @@ void TCP_Server::DataProcessing()
 
 	try {
 		for (auto element : deleteList) {
-			//óMƒf[ƒ^—p”z—ñ‚Ì‰Šú‰»
+			//å—ä¿¡ãƒ‡ãƒ¼ã‚¿ç”¨é…åˆ—ã®åˆæœŸåŒ–
 			recvDataMap[element.second].erase(recvDataMap[element.second].begin(), recvDataMap[element.second].end());
-			//ƒNƒ‰ƒCƒAƒ“ƒgƒŠƒXƒg‚©‚çíœ
+			//ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãƒªã‚¹ãƒˆã‹ã‚‰å‰Šé™¤
 			auto it = std::remove(clientList.begin(), clientList.end(), element.first);
 			clientList.erase(it, clientList.end());
 
