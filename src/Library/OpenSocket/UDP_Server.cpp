@@ -35,14 +35,14 @@ int UDP_Server::SendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, cons
 	char sendBuf[TCP_BUFFERSIZE];
 
 	try {
-		//ƒwƒbƒ_[‚ð•t‰Á‚µ‘—M
+		//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ ã—é€ä¿¡
 		memcpy(sendBuf, &sequence, sizeof(unsigned int));
 		memcpy(&sendBuf[sizeof(unsigned int)], _buf, _bufSize);
 
-		//‘—Mˆ—
+		//é€ä¿¡å‡¦ç†
 		sendDataSize = m_socket->Sendto(_addr, &sendBuf[0], _bufSize + sizeof(unsigned int));
 
-		//ƒV[ƒPƒ“ƒX”Ô†ŠÇ—
+		//ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ç•ªå·ç®¡ç†
 		sequence++;
 		if (sequence > SEQUENCEMAX) { sequence = 0; }
 	}
@@ -60,16 +60,16 @@ int UDP_Server::SendMultiClient(const std::vector<B_ADDRESS_IN> _addrList, const
 	int sendDataSize = 0;
 
 	try {
-		//ƒwƒbƒ_[‚ð•t‰Á‚µ‘—M
+		//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ ã—é€ä¿¡
 		memcpy(sendBuf, &sequence, sizeof(unsigned int));
 		memcpy(&sendBuf[sizeof(unsigned int)], _buf, _bufSize);
 
 		for (auto&& addr : _addrList) {
-			//‘—Mˆ—
+			//é€ä¿¡å‡¦ç†
 			sendDataSize = m_socket->Sendto(&addr, &sendBuf[0], _bufSize + sizeof(unsigned int));
 		}
 
-		//ƒV[ƒPƒ“ƒX”Ô†ŠÇ—
+		//ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ç•ªå·ç®¡ç†
 		sequence++;
 		if (sequence > SEQUENCEMAX) { sequence = 0; }
 	}
@@ -83,7 +83,7 @@ int UDP_Server::SendMultiClient(const std::vector<B_ADDRESS_IN> _addrList, const
 
 void UDP_Server::DataProcessing()
 {
-	//ƒtƒ@ƒCƒ‹ƒfƒBƒXƒNƒŠƒvƒ^‚ªÝ’è‚³‚ê‚Ä‚¨‚èƒrƒbƒgƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚È‚¢ê‡”²‚¯‚é‚æ‚¤‚É‚·‚é
+	//ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒè¨­å®šã•ã‚Œã¦ãŠã‚Šãƒ“ãƒƒãƒˆãƒ•ãƒ©ã‚°ãŒç«‹ã£ã¦ã„ãªã„å ´åˆæŠœã‘ã‚‹ã‚ˆã†ã«ã™ã‚‹
 	if (fds != nullptr) {
 		if (!FD_ISSET(m_socket->GetSocket(), fds)) {
 			return;
@@ -93,7 +93,7 @@ void UDP_Server::DataProcessing()
 	std::pair<B_ADDRESS_IN, std::vector<char>> addData;
 	char buf[TCP_BUFFERSIZE];
 
-	//ŽóMˆ—
+	//å—ä¿¡å‡¦ç†
 	int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], TCP_BUFFERSIZE, 0);
 	if (dataSize > 0) {
 		addData.second.resize(dataSize);

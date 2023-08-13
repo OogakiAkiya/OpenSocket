@@ -14,10 +14,10 @@ std::shared_ptr<BaseClient> UDP_Client::GetInstance(const std::string _addrs, co
 	std::shared_ptr<UDP_Client> temp = std::make_shared<UDP_Client>();
 
 	temp->m_socket = std::make_shared<BaseSocket>();
-	temp->m_socket->Init(_addrs, _port);						//IPƒAƒhƒŒƒX‚Æƒ|[ƒg”Ô†‚Ìİ’è
-	SwitchIpv(temp->m_socket, _ipv);							//IPv‚Ìİ’è
-	temp->m_socket->SetProtocol_UDP();							//TCP’ÊM‚Éİ’è
-	if (!temp->m_socket->AddressSet())return nullptr;			//ƒ\ƒPƒbƒg¶¬
+	temp->m_socket->Init(_addrs, _port);						//IPã‚¢ãƒ‰ãƒ¬ã‚¹ã¨ãƒãƒ¼ãƒˆç•ªå·ã®è¨­å®š
+	SwitchIpv(temp->m_socket, _ipv);							//IPvã®è¨­å®š
+	temp->m_socket->SetProtocol_UDP();							//TCPé€šä¿¡ã«è¨­å®š
+	if (!temp->m_socket->AddressSet())return nullptr;			//ã‚½ã‚±ãƒƒãƒˆç”Ÿæˆ
 	if (_asynchronous)temp->m_socket->SetAsynchronous();
 	return temp;
 }
@@ -36,14 +36,14 @@ int UDP_Client::SendServer(const char* _buf, const int _bufSize)
 	char sendBuf[TCP_BUFFERSIZE];
 
 	try {
-		//ƒwƒbƒ_[‚ğ•t‰Á‚µ‘—M
+		//ãƒ˜ãƒƒãƒ€ãƒ¼ã‚’ä»˜åŠ ã—é€ä¿¡
 		memcpy(&sendBuf[0], &sequence, sizeof(unsigned int));
 		memcpy(&sendBuf[sizeof(unsigned int)], &_buf[0], _bufSize);
 
-		//‘—Mˆ—
+		//é€ä¿¡å‡¦ç†
 		sendDataSize = m_socket->Sendto(&sendBuf[0], _bufSize + sizeof(unsigned int));
 
-		//ƒV[ƒPƒ“ƒX”Ô†ŠÇ—
+		//ã‚·ãƒ¼ã‚±ãƒ³ã‚¹ç•ªå·ç®¡ç†
 		sequence++;
 		if (sequence > SEQUENCEMAX) { sequence = 0; }
 	}
@@ -56,7 +56,7 @@ int UDP_Client::SendServer(const char* _buf, const int _bufSize)
 
 void UDP_Client::DataProcessing()
 {
-	//ƒtƒ@ƒCƒ‹ƒfƒBƒXƒNƒŠƒvƒ^‚ªİ’è‚³‚ê‚Ä‚¨‚èƒrƒbƒgƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚È‚¢ê‡”²‚¯‚é‚æ‚¤‚É‚·‚é
+	//ãƒ•ã‚¡ã‚¤ãƒ«ãƒ‡ã‚£ã‚¹ã‚¯ãƒªãƒ—ã‚¿ãŒè¨­å®šã•ã‚Œã¦ãŠã‚Šãƒ“ãƒƒãƒˆãƒ•ãƒ©ã‚°ãŒç«‹ã£ã¦ã„ãªã„å ´åˆæŠœã‘ã‚‹ã‚ˆã†ã«ã™ã‚‹
 	if (fds != nullptr) {
 		if (!FD_ISSET(m_socket->GetSocket(), fds)) {
 			return;
@@ -66,7 +66,7 @@ void UDP_Client::DataProcessing()
 	std::pair<B_ADDRESS_IN, std::vector<char>> addData;
 	char buf[TCP_BUFFERSIZE];
 
-	//óMˆ—
+	//å—ä¿¡å‡¦ç†
 	int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], TCP_BUFFERSIZE, 0);
 
 	if (dataSize > 0) {

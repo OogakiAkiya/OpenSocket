@@ -7,15 +7,15 @@ public:
 	~TCP_Client() {}
 	virtual void Update() override;
 	static std::shared_ptr<BaseClient> GetInstance(const std::string _addrs, const std::string _port, const int _ipv, const bool _asynchronous = false);
-	virtual int GetRecvDataSize()override { return recvDataQueList.size(); }			//ƒT[ƒo[‚©‚çóM‚µ‚½ƒf[ƒ^‚ª‚¢‚­‚Â‚ ‚é‚©
-	virtual std::vector<char> GetRecvData()override;									//ƒT[ƒo[‚©‚çóM‚µ‚½ƒf[ƒ^‚ğæ‚èo‚·
-	virtual int SendServer(const char* _buf, const int _bufSize)override;				//“Á’è‚ÌƒT[ƒo[‚É‘—M‚·‚éê‡g—p‚·‚é
+	virtual int GetRecvDataSize()override { return recvDataQueList.size(); }			//ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ãŒã„ãã¤ã‚ã‚‹ã‹
+	virtual std::vector<char> GetRecvData()override;									//ã‚µãƒ¼ãƒãƒ¼ã‹ã‚‰å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å–ã‚Šå‡ºã™
+	virtual int SendServer(const char* _buf, const int _bufSize)override;				//ç‰¹å®šã®ã‚µãƒ¼ãƒãƒ¼ã«é€ä¿¡ã™ã‚‹å ´åˆä½¿ç”¨ã™ã‚‹
 
 private:
-	//ƒƒ“ƒoŠÖ”
+	//ãƒ¡ãƒ³ãƒé–¢æ•°
 	void DataProcessing();
 
-	//ƒƒ“ƒo•Ï”
+	//ãƒ¡ãƒ³ãƒå¤‰æ•°
 	std::vector<char> recvData;
 };
 

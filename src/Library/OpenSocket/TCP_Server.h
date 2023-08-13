@@ -14,19 +14,19 @@ public:
 	virtual void Update() override;
 	virtual int GetRecvDataSize() override;
 	virtual int GetFileDescriptor(fd_set* _fds) override;
-	std::pair<int, std::vector<char>> GetRecvData();													//ƒNƒ‰ƒCƒAƒ“ƒg‚©‚çóM‚µ‚½ƒf[ƒ^‚ğæ‚èo‚·
+	std::pair<int, std::vector<char>> GetRecvData();													//ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰å—ä¿¡ã—ãŸãƒ‡ãƒ¼ã‚¿ã‚’å–ã‚Šå‡ºã™
 
-	int SendOnlyClient(const int _socket, const char* _buf, const int _bufSize);						//“Á’è‚ÌƒNƒ‰ƒCƒAƒ“ƒg‚É‘—M‚·‚éê‡g—p‚·‚é
-	int SendAllClient(const char* _buf, const int _bufSize);											//‘S‚Ä‚ÌƒNƒ‰ƒCƒAƒ“ƒg‚É‘—M‚·‚éê‡g—p‚·‚é
+	int SendOnlyClient(const int _socket, const char* _buf, const int _bufSize);						//ç‰¹å®šã®ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã«é€ä¿¡ã™ã‚‹å ´åˆä½¿ç”¨ã™ã‚‹
+	int SendAllClient(const char* _buf, const int _bufSize);											//å…¨ã¦ã®ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã«é€ä¿¡ã™ã‚‹å ´åˆä½¿ç”¨ã™ã‚‹
 private:
-	//ƒƒ“ƒoŠÖ”
+	//ãƒ¡ãƒ³ãƒé–¢æ•°
 	void AcceptProcessing();
 	void DataProcessing();
 
-	//ƒƒ“ƒo•Ï”
-	std::unordered_map<int, std::vector<char>> recvDataMap;		   //ŠeƒNƒ‰ƒCƒAƒ“ƒg‚²‚Æ‚ÌrecvData
-	std::vector<std::shared_ptr<BaseSocket>> clientList;		   //ƒNƒ‰ƒCƒAƒ“ƒg‚Ìƒ\ƒPƒbƒgî•ñ‚ğŠÇ—
-	std::queue<std::pair<int, std::vector<char>>> recvDataQueList; //ƒNƒ‰ƒCƒAƒ“ƒg‚©‚çóM‚µ‚½î•ñ‚ª“ü‚é
+	//ãƒ¡ãƒ³ãƒå¤‰æ•°
+	std::unordered_map<int, std::vector<char>> recvDataMap;		   //å„ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã”ã¨ã®recvData
+	std::vector<std::shared_ptr<BaseSocket>> clientList;		   //ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®ã‚½ã‚±ãƒƒãƒˆæƒ…å ±ã‚’ç®¡ç†
+	std::queue<std::pair<int, std::vector<char>>> recvDataQueList; //ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã‹ã‚‰å—ä¿¡ã—ãŸæƒ…å ±ãŒå…¥ã‚‹
 
 };
 
