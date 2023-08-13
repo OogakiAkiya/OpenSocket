@@ -34,6 +34,7 @@ if(OpenSSL_FOUND)
    
    target_link_libraries(
       OpenSocket.out
+      PRIVATE
       ${LIBRARY_LIST}
       ${Boost_LIBRARIES}
       OpenSSL::SSL
@@ -43,6 +44,7 @@ else()
    message(WARNING "OpenSSL not found. Building without OpenSSL support.")
    target_link_libraries(
       OpenSocket.out
+      PRIVATE
       ${LIBRARY_LIST}
       ${Boost_LIBRARIES}
    )
