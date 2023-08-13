@@ -10,8 +10,9 @@ void OpenSocket_Select(fd_set* _fds,int _maxfds)
 	select(0, _fds, NULL, NULL, NULL);
 
 #else
-	//最大のファイルディスクリプタが判明している場合
-	if (_maxfds != -1) {
+	//最大のファイルディスクリプタ(fd)が判明している場合
+	//※Unix系であれば0は標準入力,1は標準出力,2は標準エラー出力でfdが予約されているため、3が最低値のはずだがプラットフォームに依存するため負の値が入っていればfdの最大値が判明していないものとする。
+	if (_maxfds >= 0) {
 		select(_maxfds + 1, _fds, NULL, NULL, NULL);
 		return;
 	}
@@ -23,6 +24,8 @@ void OpenSocket_Select(fd_set* _fds,int _maxfds)
 			maxfds = i;
 		}
 	}
+
+	if(maxfds < 0) return;	
 	select(maxfds + 1, _fds, NULL, NULL, NULL);
 
 #endif
