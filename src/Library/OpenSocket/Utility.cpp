@@ -6,17 +6,17 @@ void OpenSocket_Select(fd_set* _fds,int _maxfds)
 {
 	
 #ifdef _MSC_VER
-	//winsock�ł͑������͖��������
+	//winsockでは第一引数は無視される
 	select(0, _fds, NULL, NULL, NULL);
 
 #else
-	//�ő�̃t�@�C���f�B�X�N���v�^���������Ă���ꍇ
+	//最大のファイルディスクリプタが判明している場合
 	if (_maxfds != -1) {
 		select(_maxfds + 1, _fds, NULL, NULL, NULL);
 		return;
 	}
 
-	//�ő�̃t�@�C���f�B�X�N���v�^���擾(�t�@�C���f�B�X�N���v�^�̂Ƃ肤��͈͂�T��)
+	//最大のファイルディスクリプタを取得(ファイルディスクリプタのとりうる範囲を探索)
 	int maxfds = -1;
 	for (int i = 0; i < FD_SETSIZE; i++) {
 		if (FD_ISSET(i,_fds)) {

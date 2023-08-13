@@ -7,7 +7,6 @@
 #define ENDMARKERSIZE strlen(ENDMARKER)
 #define TCP_HEADERSIZE sizeof(int)
 
-//�o�b�t�@�T�C�Y��1Mbyte
 //#define TCP_BUFFERSIZE 1048576
 #define TCP_BUFFERSIZE 2048
 
