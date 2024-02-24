@@ -1,16 +1,18 @@
+namespace OpenSocket {
+
 #define IPV4 1
 #define IPV6 2
 #define IPVD 3
 #define SEQUENCEMAX 4200000000
-//#define RECVPACKETMAXSIZE 1000000
+// #define RECVPACKETMAXSIZE 1000000
 #define ENDMARKER u8"\r\n"
 #define ENDMARKERSIZE strlen(ENDMARKER)
 #define TCP_HEADERSIZE sizeof(int)
 
-//#define TCP_BUFFERSIZE 1048576
+// #define TCP_BUFFERSIZE 1048576
 #define TCP_BUFFERSIZE 2048
 
-//TODO 型部分についてはtypedefに書き換え予定
+// TODO 型部分についてはtypedefに書き換え予定
 #ifdef _MSC_VER
 #define B_SOCKET SOCKET
 #define B_INIT_SOCKET INVALID_SOCKET
@@ -27,3 +29,5 @@
 #define B_ADDRESS_IN sockaddr_in
 #define B_SHUTDOWN SHUT_RDWR
 #endif
+
+}  // namespace OpenSocket
