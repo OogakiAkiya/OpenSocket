@@ -4,7 +4,7 @@ int main() {
    // UDP Client非同期通信サンプル
    //=============================================================
    std::shared_ptr<OpenSocket::BaseClient> client;
-   client = OpenSocket::UDP_Client::GetInstance("127.0.0.1", "12345", IPVD, true);
+   client = OpenSocket::UDP_Client::GetInstance("127.0.0.1", "12345", OpenSocket::IPVD, true);
    char tem[6] = "HELLO";
    int len = client->SendServer(&tem[0], sizeof(tem));
    printf("Send=%d\n", len);

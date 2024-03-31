@@ -4,7 +4,7 @@ int main() {
    // TCP Server同期通信サンプル
    //=============================================================
    fd_set readfds;
-   auto server = OpenSocket::TCP_Server::GetInstance("0.0.0.0", "12345", IPV4, false);
+   auto server = OpenSocket::TCP_Server::GetInstance("0.0.0.0", "12345", OpenSocket::IPV4, false);
    while (1) {
       FD_ZERO(&readfds);
       int maxfds = server->GetFileDescriptor(&readfds);

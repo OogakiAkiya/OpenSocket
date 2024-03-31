@@ -5,7 +5,7 @@ int main() {
    //=============================================================
    std::shared_ptr<OpenSocket::BaseClient> client;
    while (1) {
-      client = OpenSocket::TCP_Client::GetInstance("127.0.0.1", "12345", IPV4, true);
+      client = OpenSocket::TCP_Client::GetInstance("127.0.0.1", "12345", OpenSocket::IPV4, true);
       if (client) {
          break;
       } else {

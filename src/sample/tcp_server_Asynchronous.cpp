@@ -3,7 +3,7 @@ int main() {
    //=============================================================
    // TCP Server非同期通信サンプル
    //=============================================================
-   auto server = OpenSocket::TCP_Server::GetInstance("0.0.0.0", "12345", IPV4, true);
+   auto server = OpenSocket::TCP_Server::GetInstance("0.0.0.0", "12345", OpenSocket::IPV4, true);
    while (1) {
       server->Update();
 

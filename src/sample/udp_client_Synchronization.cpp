@@ -5,7 +5,7 @@ int main() {
    //=============================================================
    fd_set readfds;
    std::shared_ptr<OpenSocket::BaseClient> client;
-   client = OpenSocket::UDP_Client::GetInstance("127.0.0.1", "12345", IPVD, false);
+   client = OpenSocket::UDP_Client::GetInstance("127.0.0.1", "12345", OpenSocket::IPVD, false);
    char tem[6] = "HELLO";
    int len = client->SendServer(&tem[0], sizeof(tem));
    printf("Send=%d\n", len);
