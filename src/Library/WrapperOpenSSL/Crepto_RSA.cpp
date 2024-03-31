@@ -144,6 +144,67 @@ RELEASE_BIO:
    return ciphertext;
 }
 
+std::string Crepto_RSA::Encrypt(const std::string _pemKey, const std::vector<unsigned char>& _plaintext) {
+   // 変数定義
+   BIO* keyBio = nullptr;
+   EVP_PKEY* pkey = nullptr;
+   EVP_PKEY_CTX* ctx = nullptr;
+   std::string ciphertext;
+
+   // 鍵読み込み
+   keyBio = BIO_new_mem_buf(_pemKey.c_str(), static_cast<int>(_pemKey.size()));
+   if (!keyBio) {
+      OpenSSLErrorMessage(__FILE__, __LINE__, "keyBio is empty.");
+      goto RELEASE_BIO;
+   }
+
+   pkey = PEM_read_bio_PUBKEY(keyBio, nullptr, nullptr, nullptr);
+   if (!pkey) {
+      OpenSSLErrorMessage(__FILE__, __LINE__, "pkey is empty.");
+      goto RELEASE_BIO;
+   }
+
+   // 暗号化のための初期セッティング
+   ctx = EVP_PKEY_CTX_new(pkey, NULL);
+   if (!ctx) {
+      OpenSSLErrorMessage(__FILE__, __LINE__, "ctx is empty.");
+      goto RELEASE_PKEY;
+   }
+
+   if (EVP_PKEY_encrypt_init(ctx) != 1) {
+      OpenSSLErrorMessage(__FILE__, __LINE__, "EVP_PKEY_encrypt_init function error in Crepto_RSA");
+      goto RELEASE_CTX;
+   }
+   if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_PADDING) != 1) {
+      OpenSSLErrorMessage(__FILE__, __LINE__, "EVP_PKEY_CTX_set_rsa_padding function error in Crepto_RSA");
+      goto RELEASE_CTX;
+   }
+
+   // 暗号化後のサイズを確認する
+   size_t ciphertextLen;
+   if (EVP_PKEY_encrypt(ctx, nullptr, &ciphertextLen, _plaintext.data(), _plaintext.size()) != 1) {
+      OpenSSLErrorMessage(__FILE__, __LINE__, "EVP_PKEY_encrypt function error in Crepto_RSA");
+      goto RELEASE_CTX;
+   }
+
+   // 暗号化
+   ciphertext.resize(ciphertextLen);
+   if (EVP_PKEY_encrypt(ctx, reinterpret_cast<unsigned char*>(&ciphertext[0]), &ciphertextLen, _plaintext.data(), _plaintext.size()) != 1) {
+      OpenSSLErrorMessage(__FILE__, __LINE__, "EVP_PKEY_encrypt function error in Crepto_RSA");
+      goto RELEASE_CTX;
+   }
+
+   // メモリー解放
+RELEASE_CTX:
+   EVP_PKEY_CTX_free(ctx);
+RELEASE_PKEY:
+   EVP_PKEY_free(pkey);
+RELEASE_BIO:
+   BIO_free(keyBio);
+
+   return ciphertext;
+}
+
 std::string Crepto_RSA::Decrypt(const std::string _pemKey, const std::string& _ciphertext) {
    // 変数定義
    BIO* keyBio = nullptr;
@@ -164,7 +225,7 @@ std::string Crepto_RSA::Decrypt(const std::string _pemKey, const std::string& _c
       goto RELEASE_BIO;
    }
 
-   // 暗号化のための初期セッティング
+   // 復号のための初期セッティング
    ctx = EVP_PKEY_CTX_new(pkey, NULL);
    if (!ctx) {
       OpenSSLErrorMessage(__FILE__, __LINE__, "ctx is empty.");
@@ -181,14 +242,14 @@ std::string Crepto_RSA::Decrypt(const std::string _pemKey, const std::string& _c
       goto RELEASE_CTX;
    }
 
-   // 暗号化後のサイズを確認する
+   // 復号後のサイズを確認する
    size_t plaintextLen;
    if (EVP_PKEY_decrypt(ctx, nullptr, &plaintextLen, reinterpret_cast<const unsigned char*>(_ciphertext.c_str()), _ciphertext.size()) != 1) {
       OpenSSLErrorMessage(__FILE__, __LINE__, "EVP_PKEY_decrypt function error in Crepto_RSA");
       goto RELEASE_CTX;
    }
 
-   // 暗号化
+   // 復号
    plaintext.resize(plaintextLen);
    if (EVP_PKEY_decrypt(ctx, reinterpret_cast<unsigned char*>(&plaintext[0]), &plaintextLen, reinterpret_cast<const unsigned char*>(_ciphertext.c_str()), _ciphertext.size()) != 1) {
       OpenSSLErrorMessage(__FILE__, __LINE__, "EVP_PKEY_decrypt function error in Crepto_RSA");

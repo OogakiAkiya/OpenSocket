@@ -11,6 +11,7 @@ public:
    std::string GetPAMPublicKey();
    std::string GetPAMPrivateKey();
    std::string Encrypt(const std::string _pemKey, const std::string& _plaintext);
+   std::string Encrypt(const std::string _pemKey, const std::vector<unsigned char>& _plaintext);
    std::string Decrypt(const std::string _pemKey, const std::string& _ciphertext);
 
 private:
