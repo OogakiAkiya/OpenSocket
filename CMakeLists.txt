@@ -18,11 +18,11 @@ list(APPEND SAMPLE_FILES udp_server_Asynchronous)
 list(APPEND SAMPLE_FILES udp_server_Synchronization)
 
 # Libraryパス一覧取得
-file(GLOB LIBRARY_PAS_LIST RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "src/Library/*")
+file(GLOB LIBRARY_PATH_LIST RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "src/Library/*")
 message(STATUS "source_dir: ${CMAKE_CURRENT_SOURCE_DIR}")
 
 # subdirectoryの追加
-foreach(ITEM ${LIBRARY_PAS_LIST})
+foreach(ITEM ${LIBRARY_PATH_LIST})
 	add_subdirectory(${ITEM})
 endforeach()
 
