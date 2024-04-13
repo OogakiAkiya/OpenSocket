@@ -1,18 +1,21 @@
 namespace OpenSocket {
+
+// プログラム中で使用する定数一覧
 constexpr int IPV4 = 1;
 constexpr int IPV6 = 2;
 constexpr int IPVD = 3;
 constexpr long SEQUENCEMAX = 4200000000;
-// #define RECVPACKETMAXSIZE 1000000
-constexpr int TCP_HEADERSIZE = sizeof(int);
+// constexpr int TCP_BASE_HEADER_SIZE = sizeof(int) + sizeof(char) + sizeof(char) + sizeof(short);
+constexpr int TCP_BASE_HEADER_SIZE = sizeof(int);
 
-// #define TCP_BUFFERSIZE 1048576
-constexpr int TCP_BUFFERSIZE = 2048;
+constexpr int RECV_PACKET_MAX_SIZE = 4194304;
+constexpr int BODY_MAX_SIZE = 2048;
+#define SEND_BUFFERSIZE TCP_BASE_HEADER_SIZE + BODY_MAX_SIZE + ENDMARKERSIZE
 
 #define ENDMARKER u8"¥r¥n"
 #define ENDMARKERSIZE strlen(ENDMARKER)
 
-// TODO 型部分についてはtypedefに書き換えが可能か検証
+// MSとそれ以外のOSで使用する型の統一用マクロ
 #ifdef _MSC_VER
 #define B_SOCKET SOCKET
 #define B_INIT_SOCKET INVALID_SOCKET

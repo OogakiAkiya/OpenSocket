@@ -28,7 +28,7 @@ int UDP_Server::GetRecvDataSize() { return recvDataQueList.size(); }
 
 int UDP_Server::SendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[TCP_BUFFERSIZE];
+   char sendBuf[SEND_BUFFERSIZE];
 
    try {
       // ヘッダーを付加し送信
@@ -50,7 +50,7 @@ int UDP_Server::SendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, cons
 }
 
 int UDP_Server::SendMultiClient(const std::vector<B_ADDRESS_IN> _addrList, const char* _buf, const int _bufSize) {
-   char sendBuf[TCP_BUFFERSIZE];
+   char sendBuf[SEND_BUFFERSIZE];
    int sendDataSize = 0;
 
    try {
@@ -81,10 +81,10 @@ void UDP_Server::DataProcessing() {
    }
 
    std::pair<B_ADDRESS_IN, std::vector<char>> addData;
-   char buf[TCP_BUFFERSIZE];
+   char buf[RECV_PACKET_MAX_SIZE];
 
    // 受信処理
-   int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], TCP_BUFFERSIZE, 0);
+   int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], RECV_PACKET_MAX_SIZE, 0);
    if (dataSize > 0) {
       addData.second.resize(dataSize);
       memcpy(&addData.second[0], &buf[0], dataSize);

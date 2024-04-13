@@ -30,7 +30,7 @@ std::vector<char> UDP_Client::GetRecvData() {
 
 int UDP_Client::SendServer(const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[TCP_BUFFERSIZE];
+   char sendBuf[SEND_BUFFERSIZE];
 
    try {
       // ヘッダーを付加し送信
@@ -57,10 +57,10 @@ void UDP_Client::DataProcessing() {
    }
 
    std::pair<B_ADDRESS_IN, std::vector<char>> addData;
-   char buf[TCP_BUFFERSIZE];
+   char buf[RECV_PACKET_MAX_SIZE];
 
    // 受信処理
-   int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], TCP_BUFFERSIZE, 0);
+   int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], RECV_PACKET_MAX_SIZE, 0);
 
    if (dataSize > 0) {
       addData.second.resize(dataSize);

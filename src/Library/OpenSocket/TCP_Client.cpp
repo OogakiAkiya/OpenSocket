@@ -33,23 +33,23 @@ std::vector<char> TCP_Client::GetRecvData() {
 
 int TCP_Client::SendServer(const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[TCP_BUFFERSIZE];
-
+   char sendBuf[SEND_BUFFERSIZE];
    try {
       // ヘッダーを付加
-      memcpy(sendBuf, &_bufSize, TCP_HEADERSIZE);
-      memcpy(&sendBuf[TCP_HEADERSIZE], _buf, _bufSize);
+      memcpy(sendBuf, &_bufSize, sizeof(int));
+
+      // データの付与
+      memcpy(&sendBuf[TCP_BASE_HEADER_SIZE], _buf, _bufSize);
 
       // エンドマーカーを付与
-      memcpy(&sendBuf[TCP_HEADERSIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
+      memcpy(&sendBuf[TCP_BASE_HEADER_SIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
       // 送信
-      sendDataSize = m_socket->Send(sendBuf, _bufSize + TCP_HEADERSIZE + ENDMARKERSIZE);
+      sendDataSize = m_socket->Send(sendBuf, _bufSize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
    } catch (const std::exception& e) {
       std::cerr << "Exception Error at TCP_Client::SendServer():" << e.what() << std::endl;
       return sendDataSize;
    }
-
    return sendDataSize;
 }
 
@@ -59,8 +59,8 @@ void TCP_Client::DataProcessing() {
       if (!FD_ISSET(m_socket->GetSocket(), fds)) { return; }
    }
 
-   char buf[TCP_BUFFERSIZE];
-   int dataSize = m_socket->Recv(buf, TCP_BUFFERSIZE);
+   char buf[RECV_PACKET_MAX_SIZE];
+   int dataSize = m_socket->Recv(buf, RECV_PACKET_MAX_SIZE);
 
    if (dataSize > 0) {
       // 受信データを格納
@@ -68,41 +68,40 @@ void TCP_Client::DataProcessing() {
       recvData.resize(nowSize + dataSize);
       memcpy((char*)&recvData[nowSize], &buf[0], dataSize);
 
-      while (recvData.size() > sizeof(int)) {
-         int dataSize;
+      while (recvData.size() > TCP_BASE_HEADER_SIZE) {
+         int bodySize;
          try {
             // 先頭パケットの解析
-            memcpy(&dataSize, &recvData[0], sizeof(int));
-
+            memcpy(&bodySize, &recvData[0], sizeof(int));
             // 先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
-            if (dataSize < 0 || dataSize > TCP_BUFFERSIZE - sizeof(int) - ENDMARKERSIZE) {
+            if (bodySize < 0 || bodySize > BODY_MAX_SIZE) {
                // TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
                recvData.clear();
                return;
             }
 
-            // エンドマーカーの値が正常値かチェック
-            if (memcmp(&recvData[dataSize + sizeof(int)], &ENDMARKER, ENDMARKERSIZE) != 0) {
-               // TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
-               recvData.clear();
-               return;
-            }
+            // 受信データが一塊分あればキューに追加
+            if (recvData.size() >= TCP_BASE_HEADER_SIZE + bodySize + ENDMARKERSIZE) {
+               // エンドマーカーの値が正常値かチェック
+               if (memcmp(&recvData[bodySize + TCP_BASE_HEADER_SIZE], &ENDMARKER, ENDMARKERSIZE) != 0) {
+                  // TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
+                  recvData.clear();
+                  return;
+               }
 
+               // データの追加処理
+               std::vector<char> addData;
+               addData.resize(bodySize);
+               memcpy(&addData[0], &recvData[TCP_BASE_HEADER_SIZE], bodySize);
+               recvDataQueList.push(addData);
+               recvData.erase(recvData.begin(), recvData.begin() + bodySize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
+            }
          } catch (const std::exception& e) {
             std::cerr << "Exception Error at TCP_Routine::Update():" << e.what() << std::endl;
 
             // TODO:不正パケットなどで先頭データがintでmemcpyできなかった際はパケットをすべて削除しているが何かいい手がないか考える
             recvData.clear();
             return;
-         }
-
-         // 受信データが一塊分あればキューに追加
-         if (recvData.size() > dataSize) {
-            std::vector<char> addData;
-            addData.resize(dataSize);
-            memcpy(&addData[0], &recvData[sizeof(int)], dataSize);
-            recvDataQueList.push(addData);
-            recvData.erase(recvData.begin(), recvData.begin() + dataSize + sizeof(int) + ENDMARKERSIZE);
          }
       }
    } else if (dataSize == 0) {

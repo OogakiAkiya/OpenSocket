@@ -24,7 +24,10 @@ std::shared_ptr<TCP_Server> TCP_Server::GetInstance(const std::string _addrs, co
 void TCP_Server::Update() {
    // ファイルディスクリプタが設定されていない場合
    if (fds == nullptr) {
+      // socketへの接続要求のチェック
       AcceptProcessing();
+
+      // クライアントからの送付データの整形等を実施
       if (clientList.size() > 0) DataProcessing();
       return;
    }
@@ -48,18 +51,20 @@ int TCP_Server::GetFileDescriptor(fd_set* _fds) {
 
 int TCP_Server::SendOnlyClient(const int _socket, const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[TCP_BUFFERSIZE];
+   char sendBuf[SEND_BUFFERSIZE];
 
    try {
       // ヘッダーを付加
-      memcpy(sendBuf, &_bufSize, TCP_HEADERSIZE);
-      memcpy(&sendBuf[TCP_HEADERSIZE], _buf, _bufSize);
+      memcpy(sendBuf, &_bufSize, sizeof(int));
+
+      // データの付与
+      memcpy(&sendBuf[TCP_BASE_HEADER_SIZE], _buf, _bufSize);
 
       // エンドマーカーを付与
-      memcpy(&sendBuf[TCP_HEADERSIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
+      memcpy(&sendBuf[TCP_BASE_HEADER_SIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
       for (auto&& clients : clientList) {
-         if (clients->GetSocket() == _socket) sendDataSize = clients->Send(sendBuf, _bufSize + TCP_HEADERSIZE + ENDMARKERSIZE);
+         if (clients->GetSocket() == _socket) sendDataSize = clients->Send(sendBuf, _bufSize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
       }
    } catch (const std::exception& e) {
       std::cerr << "Exception Error at TCP_Server::SendOnlyClient():" << e.what() << std::endl;
@@ -71,17 +76,19 @@ int TCP_Server::SendOnlyClient(const int _socket, const char* _buf, const int _b
 
 int TCP_Server::SendAllClient(const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[TCP_BUFFERSIZE];
+   char sendBuf[SEND_BUFFERSIZE];
 
    try {
       // ヘッダーを付加
-      memcpy(sendBuf, &_bufSize, TCP_HEADERSIZE);
-      memcpy(&sendBuf[TCP_HEADERSIZE], _buf, _bufSize);
+      memcpy(sendBuf, &_bufSize, sizeof(int));
+
+      // データの付与
+      memcpy(&sendBuf[TCP_BASE_HEADER_SIZE], _buf, _bufSize);
 
       // エンドマーカーを付与
-      memcpy(&sendBuf[TCP_HEADERSIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
+      memcpy(&sendBuf[TCP_BASE_HEADER_SIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
-      for (auto&& clients : clientList) { sendDataSize = clients->Send(sendBuf, _bufSize + TCP_HEADERSIZE + ENDMARKERSIZE); }
+      for (auto&& clients : clientList) { sendDataSize = clients->Send(sendBuf, _bufSize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE); }
    } catch (const std::exception& e) {
       std::cerr << "Exception Error at TCP_Server::SendAllClient():" << e.what() << std::endl;
       return sendDataSize;
@@ -111,7 +118,7 @@ void TCP_Server::DataProcessing() {
    std::list<std::pair<std::shared_ptr<BaseSocket>, int>> deleteList;
 
    for (int i = 0; i < clientList.size(); i++) {
-      char buf[TCP_BUFFERSIZE];
+      char buf[RECV_PACKET_MAX_SIZE];
       int socket = clientList.at(i)->GetSocket();
 
       // fdsがセットされておりsocketにイベントが発生しているか確認し、発生していなければスキップ
@@ -120,32 +127,43 @@ void TCP_Server::DataProcessing() {
       }
 
       // データを受信した際はそのバイト数が入り切断された場合は0,ノンブロッキングモードでデータを受信してない間は-1がdataSizeに入る
-      int dataSize = clientList.at(i)->Recv(buf, TCP_BUFFERSIZE);
-
+      int dataSize = clientList.at(i)->Recv(buf, RECV_PACKET_MAX_SIZE);
       if (dataSize > 0) {
          // 受信データを格納
          int nowSize = recvDataMap[socket].size();
          recvDataMap[socket].resize(nowSize + dataSize);
          memcpy((char*)&recvDataMap[socket][nowSize], &buf[0], dataSize);
 
-         while (recvDataMap[socket].size() > sizeof(int)) {
-            int dataSize = 0;
+         while (recvDataMap[socket].size() > TCP_BASE_HEADER_SIZE) {
+            int bodySize;
             try {
-               memcpy(&dataSize, &recvDataMap[(B_SOCKET)socket][0], sizeof(int));
+               // 先頭パケットの解析
+               memcpy(&bodySize, &recvDataMap[(B_SOCKET)socket][0], sizeof(int));
 
                // 先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
-               if (dataSize < 0 || dataSize > TCP_BUFFERSIZE - sizeof(int) - ENDMARKERSIZE) {
-                  // TODO 不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
-                  recvDataMap[(B_SOCKET)socket].clear();
-                  return;
-               }
-
-               // エンドマーカーの値が正常値かチェック
-               if (memcmp(&recvDataMap[(B_SOCKET)socket][dataSize + sizeof(int)], &ENDMARKER, ENDMARKERSIZE) != 0) {
+               if (bodySize < 0 || bodySize > BODY_MAX_SIZE) {
                   // TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
                   recvDataMap[(B_SOCKET)socket].clear();
                   return;
                }
+
+               // 受信データが一塊分あればレシーブキューに追加
+               if (recvDataMap[socket].size() >= TCP_BASE_HEADER_SIZE + bodySize + ENDMARKERSIZE) {
+                  // エンドマーカーの値が正常値かチェック()
+                  if (memcmp(&recvDataMap[(B_SOCKET)socket][bodySize + TCP_BASE_HEADER_SIZE], &ENDMARKER, ENDMARKERSIZE) != 0) {
+                     // TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
+                     recvDataMap[(B_SOCKET)socket].clear();
+                     return;
+                  }
+
+                  std::pair<B_SOCKET, std::vector<char>> addData;
+                  addData.first = socket;
+                  addData.second.resize(bodySize);
+                  memcpy(&addData.second[0], &recvDataMap[socket][TCP_BASE_HEADER_SIZE], bodySize);
+                  recvDataQueList.push(addData);
+                  recvDataMap[socket].erase(recvDataMap[socket].begin(), recvDataMap[socket].begin() + bodySize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
+               }
+
             } catch (const std::exception& e) {
                std::cerr << "Exception Error at TCP_Server::DataProcessing:" << e.what() << std::endl;
 
@@ -153,18 +171,7 @@ void TCP_Server::DataProcessing() {
                recvDataMap[(B_SOCKET)socket].clear();
                return;
             }
-
-            // 受信データが一塊分あればレシーブキューに追加
-            if (recvDataMap[socket].size() > dataSize) {
-               std::pair<B_SOCKET, std::vector<char>> addData;
-               addData.first = socket;
-               addData.second.resize(dataSize);
-               memcpy(&addData.second[0], &recvDataMap[socket][sizeof(int)], dataSize);
-               recvDataQueList.push(addData);
-               recvDataMap[socket].erase(recvDataMap[socket].begin(), recvDataMap[socket].begin() + dataSize + sizeof(int) + ENDMARKERSIZE);
-            }
          }
-
       } else if (dataSize == 0) {
          // 接続を終了するとき
          std::cout << "connection is lost" << std::endl;
