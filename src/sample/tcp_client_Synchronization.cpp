@@ -1,4 +1,4 @@
-﻿#include "Library/OpenSocket/OpenSocket.h"
+﻿#include "../Library/OpenSocket/OpenSocket.h"
 int main() {
    //=============================================================
    // TCP Client同期通信サンプル
@@ -14,8 +14,8 @@ int main() {
       }
    }
    // 送信処理(仮)
-   char tem[6] = "HELLO";
-   int dataSize = client->SendServer(tem, sizeof(tem));
+   char sendMsg[6] = "HELLO";
+   int dataSize = client->SendServer(sendMsg, sizeof(sendMsg));
    printf("SendData=%d\n", dataSize);
 
    while (1) {
@@ -28,11 +28,11 @@ int main() {
       client->Update();
       if (client->GetRecvDataSize() > 0) {
          // 受信処理
-         std::vector<char> temp = client->GetRecvData();
+         std::vector<char> recvData = client->GetRecvData();
          char buf[100];
-         std::memcpy(buf, &temp[0], temp.size());
+         std::memcpy(buf, &recvData[0], recvData.size());
          printf("%s\n", buf);
-         client->SendServer(&temp[0], temp.size());
+         client->SendServer(&recvData[0], recvData.size());
       }
    }
 }

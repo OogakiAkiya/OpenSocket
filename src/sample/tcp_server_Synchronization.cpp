@@ -1,10 +1,10 @@
-﻿#include "Library/OpenSocket/OpenSocket.h"
+﻿#include "../Library/OpenSocket/OpenSocket.h"
 int main() {
    //=============================================================
    // TCP Server同期通信サンプル
    //=============================================================
    fd_set readfds;
-   auto server = OpenSocket::TCP_Server::GetInstance("0.0.0.0", "12345", OpenSocket::IPV4, false);
+   std::shared_ptr<OpenSocket::TCP_Server> server = OpenSocket::TCP_Server::GetInstance("0.0.0.0", "12345", OpenSocket::IPV4, false);
    while (1) {
       FD_ZERO(&readfds);
       int maxfds = server->GetFileDescriptor(&readfds);
@@ -15,8 +15,10 @@ int main() {
 
       // データ送信処理
       while (server->GetRecvDataSize() > 0) {
-         auto recvData = server->GetRecvData();
+         std::pair<int, std::vector<char>> recvData = server->GetRecvData();
+         printf("Recv=%s\n", &recvData.second[0]);
          int sendDataSize = server->SendOnlyClient(recvData.first, &recvData.second[0], recvData.second.size());
+         printf("Send=%d\n", sendDataSize);
       }
    }
 }
