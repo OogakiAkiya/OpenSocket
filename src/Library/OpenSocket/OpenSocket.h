@@ -11,3 +11,11 @@
 #include "TCP_Server.h"
 #include "UDP_Client.h"
 #include "UDP_Server.h"
+
+#ifdef OPENSSL_ENABLED
+   #include "OpenSocket_Cipher_Def.h"
+
+   #include "../WrapperOpenSSL/WrapperOpenSSL.h"
+   #include "TCP_Cipher_Client.h"
+   #include "TCP_Cipher_Server.h"
+#endif

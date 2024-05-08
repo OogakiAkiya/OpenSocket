@@ -29,4 +29,22 @@ void OpenSocket_Select(fd_set* _fds, int _maxfds) {
 #endif
 }
 
+std::string GenerateRandomStringNoSymbol(int _len) {
+   std::string charList = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+   // デバイスから乱数の取得
+   std::random_device rd;
+
+   // シード値の設定
+   std::mt19937 mt(rd());
+
+   // 乱数の範囲指定
+   std::uniform_int_distribution<int> rand(0, charList.size() - 1);
+
+   // 乱数を生成し文字列リストから文字を取得し文字列の生成
+   std::string output;
+   for (int i = 0; i < _len; ++i) { output += charList[rand(mt)]; }
+   return output;
+}
+
 }  // namespace OpenSocket

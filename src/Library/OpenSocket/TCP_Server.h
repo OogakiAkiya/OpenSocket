@@ -14,15 +14,17 @@ public:
 
    int SendOnlyClient(const int _socket, const char* _buf, const int _bufSize);  // 特定のクライアントに送信する場合使用する
    int SendAllClient(const char* _buf, const int _bufSize);                      // 全てのクライアントに送信する場合使用する
-private:
-   // メンバ関数
+protected:
    void AcceptProcessing();
-   void DataProcessing();
 
    // メンバ変数
    std::unordered_map<int, std::vector<char>> recvDataMap;         // 各クライアントごとのrecvData
    std::vector<std::shared_ptr<BaseSocket>> clientList;            // クライアントのソケット情報を管理
    std::queue<std::pair<int, std::vector<char>>> recvDataQueList;  // クライアントから受信した情報が入る
+
+private:
+   // メンバ関数
+   void DataProcessing();
 };
 }  // namespace OpenSocket
 #endif
