@@ -44,8 +44,8 @@ int TCP_Cipher_Client::CiphserSendServer(const char* _buf, const int _bufSize, c
       std::string encodeData = aes->Encrypt(aesKey, aesKeyByteSize, plainData);
 
       // 送信データの付与
-      memcpy(&sendBuf[sendDataSize], encodeData.data(), strlen(encodeData.data()));
-      sendDataSize += strlen(encodeData.data());
+      memcpy(&sendBuf[sendDataSize], encodeData.data(), encodeData.size());
+      sendDataSize += encodeData.size();
 
       // 暗号化したデータの送信
       return TCP_Client::SendServer(sendBuf, sendDataSize);
@@ -166,15 +166,12 @@ void TCP_Cipher_Client::CipherProcessing(std::vector<char> _data) {
 
             // 暗号化した公開鍵の暗号化
             std::string sharedKey;
-            while (1) {
-               // 共通鍵の作成
-               aes->GenerateKey(aesKey, aesKeyByteSize);
+            // 共通鍵の作成
+            aes->GenerateKey(aesKey, aesKeyByteSize);
 
-               // 受信した公開鍵で共通鍵を暗号化
-               sharedKey = rsa->Encrypt(pubKey, aesKey);
-               if (strlen(sharedKey.data()) == rsaKeyByteSize) break;
-            }
-            CiphserSendServer(sharedKey.data(), strlen(sharedKey.data()), CIPHER_PACKET, CIPHER_PACKET_REGISTRY_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
+            // 受信した公開鍵で共通鍵を暗号化
+            sharedKey = rsa->Encrypt(pubKey, aesKey);
+            CiphserSendServer(sharedKey.data(), sharedKey.size(), CIPHER_PACKET, CIPHER_PACKET_REGISTRY_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
          } break;
          case CIPHER_PACKET_REGISTRIED_SHAREDKEY:
 
@@ -197,14 +194,14 @@ void TCP_Cipher_Client::CipherProcessing(std::vector<char> _data) {
             std::string encodeData = aes->Encrypt(aesKey, aesKeyByteSize, hashCheckData);
 
             // 受信データのハッシュ化
-            CiphserSendServer(encodeData.data(), strlen(encodeData.data()), CIPHER_PACKET, CIPHER_PACKET_CHECK_CHECKDATA_REQUEST, PADDING_DATA, PADDING_DATA);
+            CiphserSendServer(encodeData.data(), encodeData.size(), CIPHER_PACKET, CIPHER_PACKET_CHECK_CHECKDATA_REQUEST, PADDING_DATA, PADDING_DATA);
 
             // デバッグ
             std::cout << "plainData:" << checkData << std::endl;
             std::cout << "decodeData:" << decodeData << std::endl;
             std::cout << "hashCheckData:" << hashCheckData << std::endl;
             std::cout << "encodeData:" << encodeData << std::endl;
-            std::cout << "encodeData.size:" << strlen(encodeData.data()) << std::endl;
+            std::cout << "encodeData.size:" << encodeData.size() << std::endl;
 
          } break;
          case CIPHER_PACKET_CHECK_SUCCESS:

@@ -61,8 +61,8 @@ int TCP_Cipher_Server::CipherSendOnlyClient(const int _socket, const char* _buf,
       std::string encodeData = aes->Encrypt(aesKeyList[_socket], aesKeyList[_socket].size(), plainData);
 
       // 送信データの付与
-      memcpy(&sendBuf[sendDataSize], encodeData.data(), strlen(encodeData.data()));
-      sendDataSize += strlen(encodeData.data());
+      memcpy(&sendBuf[sendDataSize], encodeData.data(), encodeData.size());
+      sendDataSize += encodeData.size();
 
       // 暗号化したデータの送信
       return TCP_Server::SendOnlyClient(_socket, sendBuf, sendDataSize);
@@ -200,7 +200,7 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
                rsaKeyList.insert({_data.first, rsa->GetPAMPrivateKey()});
 
                // 公開鍵をclientへ送信
-               CipherSendOnlyClient(_data.first, pubKey.data(), strlen(pubKey.data()), CIPHER_PACKET, CIPHER_PACKET_SEND_PUBLICKEY, PADDING_DATA, PADDING_DATA);
+               CipherSendOnlyClient(_data.first, pubKey.data(), pubKey.size(), CIPHER_PACKET, CIPHER_PACKET_SEND_PUBLICKEY, PADDING_DATA, PADDING_DATA);
             }
             break;
          case CIPHER_PACKET_RECREATE_PUBLICKEY_REQUEST:
@@ -227,7 +227,7 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
 
             // チェックデータをクライアントに送信(パケットは暗号化されている)
             std::cout << "check data send" << std::endl;
-            CipherSendOnlyClient(_data.first, checkData.data(), strlen(checkData.data()), CIPHER_PACKET, CIPHER_PACKET_SEND_CHECKDATA, PADDING_DATA, PADDING_DATA);
+            CipherSendOnlyClient(_data.first, checkData.data(), checkData.size(), CIPHER_PACKET, CIPHER_PACKET_SEND_CHECKDATA, PADDING_DATA, PADDING_DATA);
             std::cout << "check data sended" << std::endl;
 
          } break;
@@ -235,7 +235,7 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
             // 受信データの復号処理
             std::string encodeData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
             std::cout << "encodeData:" << encodeData << std::endl;
-            std::cout << "encodeData.size:" << strlen(encodeData.data()) << std::endl;
+            std::cout << "encodeData.size:" << encodeData.size() << std::endl;
             std::cout << "aesKeyList[_data.first].size():" << aesKeyList[_data.first].size() << std::endl;
 
             std::string clientHashData = aes->Decrypt(aesKeyList[_data.first], aesKeyList[_data.first].size(), encodeData);
@@ -274,8 +274,8 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
             // データの追加処理
             std::pair<B_SOCKET, std::vector<char>> addData;
             addData.first = _data.first;
-            addData.second.resize(strlen(decodeData.data()));
-            memcpy(&addData.second[0], decodeData.data(), strlen(decodeData.data()));
+            addData.second.resize(decodeData.size());
+            memcpy(&addData.second[0], decodeData.data(), decodeData.size());
 
             recvDataQueList.push(addData);
             break;
