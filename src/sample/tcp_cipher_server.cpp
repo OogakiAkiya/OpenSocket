@@ -13,9 +13,9 @@ int main() {
 
       while (server->GetRecvDataSize() > 0) {
          std::pair<int, std::vector<char>> recvData = server->GetRecvData();
-         // printf("Recv=%s\n", &recvData.second[0]);
+         printf("Recv=%s\n", &recvData.second[0]);
          int sendDataSize = server->CipherSendOnlyClient(recvData.first, &recvData.second[0], recvData.second.size(), OpenSocket::CIPHER_PACKET, OpenSocket::CIPHER_PACKET_SEND_DATA, OpenSocket::PADDING_DATA, OpenSocket::PADDING_DATA);
-         // printf("Send=%d\n", sendDataSize);
+         printf("Send=%d\n", sendDataSize);
       }
    }
 }

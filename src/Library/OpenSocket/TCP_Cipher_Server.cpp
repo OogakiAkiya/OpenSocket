@@ -226,35 +226,22 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
             checkDataList.insert({_data.first, checkData});
 
             // チェックデータをクライアントに送信(パケットは暗号化されている)
-            std::cout << "check data send" << std::endl;
             CipherSendOnlyClient(_data.first, checkData.data(), checkData.size(), CIPHER_PACKET, CIPHER_PACKET_SEND_CHECKDATA, PADDING_DATA, PADDING_DATA);
-            std::cout << "check data sended" << std::endl;
 
          } break;
          case CIPHER_PACKET_CHECK_CHECKDATA_REQUEST: {
             // 受信データの復号処理
             std::string encodeData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
-            std::cout << "encodeData:" << encodeData << std::endl;
-            std::cout << "encodeData.size:" << encodeData.size() << std::endl;
-            std::cout << "aesKeyList[_data.first].size():" << aesKeyList[_data.first].size() << std::endl;
-
             std::string clientHashData = aes->Decrypt(aesKeyList[_data.first], aesKeyList[_data.first].size(), encodeData);
-            std::cout << "hashData:" << clientHashData << std::endl;
 
             // サーバ側に登録されているチェックデータをハッシュ化
             std::string serverHashData = WrapperOpenSSL::createMD5Hash(checkDataList[_data.first]);
-            std::cout << "serverHashData:" << serverHashData << std::endl;
-            std::cout << "serverHashData.size:" << serverHashData.size() << std::endl;
-            std::cout << "clientHashData:" << clientHashData << std::endl;
-            std::cout << "clientHashData.size:" << clientHashData.size() << std::endl;
 
             char sendBuf[0];
             if (serverHashData == clientHashData) {
-               std::cout << "success" << std::endl;
                // サーバに登録されているチェックデータとクライアントから送付されたチェックデータが一致したため成功
                CipherSendOnlyClient(_data.first, sendBuf, sizeof(sendBuf) / sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_CHECK_SUCCESS, PADDING_DATA, PADDING_DATA);
             } else {
-               std::cout << "faild" << std::endl;
                // 登録した共通鍵を削除
                aesKeyList.erase(_data.first);
 

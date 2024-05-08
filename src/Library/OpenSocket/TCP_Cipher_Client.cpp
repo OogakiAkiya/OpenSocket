@@ -180,14 +180,11 @@ void TCP_Cipher_Client::CipherProcessing(std::vector<char> _data) {
             CiphserSendServer(sendBuf, sizeof(sendBuf) / sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_CHECK_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
             break;
          case CIPHER_PACKET_SEND_CHECKDATA: {
-            std::cout << "check data start" << std::endl;
-
             // 受信データの型変換
             std::string checkData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
             std::string decodeData = aes->Decrypt(aesKey, aesKeyByteSize, checkData);
 
             // サーバから送信されたチェックデータのハッシュ化
-            // std::string hashCheckData = WrapperOpenSSL::createMD5Hash(checkData);
             std::string hashCheckData = WrapperOpenSSL::createMD5Hash(decodeData);
 
             // ハッシュ値の暗号化
@@ -195,14 +192,6 @@ void TCP_Cipher_Client::CipherProcessing(std::vector<char> _data) {
 
             // 受信データのハッシュ化
             CiphserSendServer(encodeData.data(), encodeData.size(), CIPHER_PACKET, CIPHER_PACKET_CHECK_CHECKDATA_REQUEST, PADDING_DATA, PADDING_DATA);
-
-            // デバッグ
-            std::cout << "plainData:" << checkData << std::endl;
-            std::cout << "decodeData:" << decodeData << std::endl;
-            std::cout << "hashCheckData:" << hashCheckData << std::endl;
-            std::cout << "encodeData:" << encodeData << std::endl;
-            std::cout << "encodeData.size:" << encodeData.size() << std::endl;
-
          } break;
          case CIPHER_PACKET_CHECK_SUCCESS:
             iskeychange = true;
