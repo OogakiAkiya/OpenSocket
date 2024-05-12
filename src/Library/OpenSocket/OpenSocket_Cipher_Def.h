@@ -14,13 +14,13 @@ constexpr int AES_KEY_LEN_256 = 32;
 /* パディング用データ(全セグメント共通) */
 constexpr char PADDING_DATA = 0;
 
-/* パケット大分類(ヘッダーの第二セグメントに指定) */
+/* パケット大分類(ヘッダーの第一セグメントに指定) */
 constexpr char NORMAL_PACKET = 1;
 constexpr char CIPHER_PACKET = 2;
 
-/* パケット分類NORMAL_PACKET: パケット情報(ヘッダーの第三セグメントに指定) */
+/* パケット分類NORMAL_PACKET: パケット情報(ヘッダーの第二セグメントに指定) */
 constexpr char NORMAL_PACKET_SEND_DATA = 10;
-/* パケット分類CIPHER_PACKET: パケット情報(ヘッダーの第三セグメントに指定) */
+/* パケット分類CIPHER_PACKET: パケット情報(ヘッダーの第二セグメントに指定) */
 constexpr char CIPHER_PACKET_SEND_DATA = 10;
 constexpr char CIPHER_PACKET_CREATE_PUBLICKEY_REQUEST = 21;
 constexpr char CIPHER_PACKET_RECREATE_PUBLICKEY_REQUEST = 22;
@@ -33,7 +33,7 @@ constexpr char CIPHER_PACKET_CHECK_CHECKDATA_REQUEST = 28;
 constexpr char CIPHER_PACKET_CHECK_SUCCESS = 29;
 constexpr char CIPHER_PACKET_CHECK_FAILD = 30;
 
-/* パケット分類CIPHER_PACKET,パケット情報CIPHER_PACKET_CREATE_PUBLICKEY_REQUEST: オプション情報1(ヘッダーの第四セグメントに指定) */
+/* パケット分類CIPHER_PACKET,パケット情報CIPHER_PACKET_CREATE_PUBLICKEY_REQUEST: オプション情報1(ヘッダーの第三セグメントに指定) */
 constexpr char CIPHER_PACKET_RSA_KEY_SIZE_2048 = 10;
 
 }  // namespace OpenSocket

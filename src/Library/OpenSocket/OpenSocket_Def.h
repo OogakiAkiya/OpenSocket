@@ -8,7 +8,7 @@ constexpr long SEQUENCEMAX = 4200000000;
 constexpr int TCP_BASE_HEADER_SIZE = sizeof(int);
 
 constexpr int RECV_PACKET_MAX_SIZE = 4194304;
-constexpr int BODY_MAX_SIZE = 2048;
+constexpr int BODY_MAX_SIZE = 1048576;
 #define SEND_BUFFERSIZE TCP_BASE_HEADER_SIZE + BODY_MAX_SIZE + ENDMARKERSIZE
 
 #define ENDMARKER u8"¥r¥n"
