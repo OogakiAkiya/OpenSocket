@@ -1,13 +1,23 @@
 # CMakeのバージョンを設定
 cmake_minimum_required(VERSION 3.13)
 
-# プロジェクト名と使用する言語を設定
+# プロジェクト名
 project(OpenSocket)
 
 # C++バージョン指定
-add_definitions( -std=c++11 -Wall )
+add_definitions( -std=c++11 -Wall)
 
-# サンプル用の実行ファイル変数作成
+# ビルドに必要なopensslの検出
+find_package(OpenSSL 3.0 REQUIRED)
+if(OPENSSL_FOUND)
+	message(STATUS "OpenSSL Version: ${OPENSSL_VERSION}")
+	message(STATUS "OpenSSL Library Path: ${OPENSSL_LIBRARIES}")
+
+	# プリプロセッサ識別子追加
+    add_definitions( -DOPENSSL_ENABLED)
+endif()
+
+# 非暗号化サンプルファイル
 set(SAMPLE_FILES tcp_client_Asynchronous)
 list(APPEND SAMPLE_FILES tcp_client_Synchronization)
 list(APPEND SAMPLE_FILES tcp_server_Asynchronous)
@@ -17,45 +27,46 @@ list(APPEND SAMPLE_FILES udp_client_Synchronization)
 list(APPEND SAMPLE_FILES udp_server_Asynchronous)
 list(APPEND SAMPLE_FILES udp_server_Synchronization)
 
-# Libraryパス一覧取得
-file(GLOB LIBRARY_PATH_LIST RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "src/Library/*")
-message(STATUS "source_dir: ${CMAKE_CURRENT_SOURCE_DIR}")
+# 暗号化サンプル
+set(CIPHER_SAMPLE_FILES tcp_cipher_client)
+list(APPEND CIPHER_SAMPLE_FILES tcp_cipher_server)
 
-# subdirectoryの追加
-foreach(ITEM ${LIBRARY_PATH_LIST})
-	add_subdirectory(${ITEM})
-endforeach()
 
-# ライブラリのディレクトリ名取得
-file(GLOB LIBRARY_LIST RELATIVE "${CMAKE_SOURCE_DIR}/src/Library/" "src/Library/*")
+# 暗号化ライブラリも含めたビルド実施
+if(OPENSSL_FOUND)
+	# ライブラリの追加
+	add_subdirectory(src/Library/OpenSocket)
+	add_subdirectory(src/Library/WrapperOpenSSL)
 
-# メイン実行ファイルの設定
-add_executable(OpenSocket.out  ${PROJECT_SOURCE_DIR}/src/main.cpp)
+	#メイン実行ファイルの設定
+	add_executable(main.out  ${PROJECT_SOURCE_DIR}/src/main.cpp)
+	target_link_libraries(main.out PRIVATE OpenSocket WrapperOpenSSL)
 
-# サンプル実行ファイルの設定
-foreach(FILE ${SAMPLE_FILES})
-	add_executable(${FILE}.out  ${PROJECT_SOURCE_DIR}/src/sample/${FILE}.cpp)
-endforeach()
-
-# ライブラリのリンク設定(opensslが見つかった場合)
-get_property(OPENSSL_ENABLED GLOBAL PROPERTY OPENSSL_ENABLED)
-
-if(OPENSSL_ENABLED)
-	# プリプロセッサ識別子追加
-	target_compile_definitions(OpenSocket.out PRIVATE OPENSSL_ENABLED)
-
-	# サンプル実行ファイル用
+	# 非暗号化サンプル実行ファイルの設定
 	foreach(FILE ${SAMPLE_FILES})
-		target_compile_definitions(${FILE}.out PRIVATE OPENSSL_ENABLED)
+		add_executable(${FILE}.out  ${PROJECT_SOURCE_DIR}/src/sample/${FILE}.cpp)
+		target_link_libraries(${FILE}.out PRIVATE OpenSocket WrapperOpenSSL)
 	endforeach()
+
+	# 暗号化サンプル実行ファイルの設定
+	foreach(FILE ${CIPHER_SAMPLE_FILES})
+		add_executable(${FILE}.out  ${PROJECT_SOURCE_DIR}/src/sample/${FILE}.cpp)
+		target_link_libraries(${FILE}.out PRIVATE OpenSocket WrapperOpenSSL)
+	endforeach()
+
+	else()
 	
-else()
-	message(WARNING "OpenSSL not found. Building without OpenSSL support.")
+	# ライブラリの追加
+	add_subdirectory(src/Library/OpenSocket)
+
+	#メイン実行ファイルの設定
+	add_executable(main.out  ${PROJECT_SOURCE_DIR}/src/main.cpp)
+	target_link_libraries(main.out PRIVATE OpenSocket)
+
+	# 非暗号化サンプル実行ファイルの設定
+	foreach(FILE ${SAMPLE_FILES})
+		add_executable(${FILE}.out  ${PROJECT_SOURCE_DIR}/src/sample/${FILE}.cpp)
+		target_link_libraries(${FILE}.out PRIVATE OpenSocket WrapperOpenSSL)
+	endforeach()
 endif()
 
-target_link_libraries(OpenSocket.out PRIVATE ${LIBRARY_LIST})
-
-# サンプル実行ファイル用
-foreach(FILE ${SAMPLE_FILES})
-	target_link_libraries(${FILE}.out PRIVATE ${LIBRARY_LIST})
-endforeach()
