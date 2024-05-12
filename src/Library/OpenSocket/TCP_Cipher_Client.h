@@ -14,9 +14,10 @@ public:
    bool KeyChangeConnectionStart(int _rsaKeyByteSize, int _aesKeyBitSize);
 
 private:
-   // メンバ関数
    void DataProcessing();
    void CipherProcessing(std::vector<char> _data);
+
+   // 鍵交換完了フラグ
    bool iskeychange = false;
 
    // 公開暗号

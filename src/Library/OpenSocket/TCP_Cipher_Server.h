@@ -11,13 +11,18 @@ public:
    int CipherSendOnlyClient(const int _socket, const char* _buf, const int _bufSize, const char _firstClass, const char _secondClass, const char _firstOption, const char _secondOption);  // 特定のクライアントに送信する場合使用する
 
 private:
-   // メンバ関数
    void DataProcessing();
    void CipherProcessing(std::pair<B_SOCKET, std::vector<char>> _data);
+
+   // 公開鍵暗号
    std::shared_ptr<WrapperOpenSSL::Crepto_RSA> rsa = std::make_shared<WrapperOpenSSL::Crepto_RSA>();
-   std::shared_ptr<WrapperOpenSSL::Crepto_AES> aes = std::make_shared<WrapperOpenSSL::Crepto_AES>();
    std::unordered_map<B_SOCKET, std::string> rsaKeyList;
+
+   // 共通鍵暗号
+   std::shared_ptr<WrapperOpenSSL::Crepto_AES> aes = std::make_shared<WrapperOpenSSL::Crepto_AES>();
    std::unordered_map<B_SOCKET, std::vector<unsigned char>> aesKeyList;
+
+   // チェックデータリスト
    std::unordered_map<B_SOCKET, std::string> checkDataList;
 };
 }  // namespace OpenSocket
