@@ -25,7 +25,7 @@ std::shared_ptr<TCP_Cipher_Client> TCP_Cipher_Client::GetInstance(const std::str
 }
 void TCP_Cipher_Client::Update() { DataProcessing(); }
 
-int TCP_Cipher_Client::CiphserSendServer(const char* _buf, const int _bufSize, const char _firstClass, const char _secondClass, const char _firstOption, const char _secondOption) {
+int TCP_Cipher_Client::CipherSendServer(const char* _buf, const int _bufSize, const char _firstClass, const char _secondClass, const char _firstOption, const char _secondOption) {
    int sendDataSize = 0;
    char sendBuf[TCP_SEND_BUFFERSIZE];
 
@@ -67,7 +67,7 @@ bool TCP_Cipher_Client::KeyChangeConnectionStart(int _rsaKeyByteSize, int _aesKe
    rsaKeyByteSize = _rsaKeyByteSize;
 
    // Serverへ鍵交換を要求
-   if (rsaKeyByteSize == RSA_KEY_2048_BYTE_SIZE) CiphserSendServer(sendBuf, sendDataSize, CIPHER_PACKET, CIPHER_PACKET_CREATE_PUBLICKEY_REQUEST, CIPHER_PACKET_RSA_KEY_SIZE_2048, PADDING_DATA);
+   if (rsaKeyByteSize == RSA_KEY_2048_BYTE_SIZE) CipherSendServer(sendBuf, sendDataSize, CIPHER_PACKET, CIPHER_PACKET_CREATE_PUBLICKEY_REQUEST, CIPHER_PACKET_RSA_KEY_SIZE_2048, PADDING_DATA);
 
    // 後続の鍵交換処理の実施
    while (iskeychange == false) { Update(); }
@@ -171,13 +171,13 @@ void TCP_Cipher_Client::CipherProcessing(std::vector<char> _data) {
 
             // 受信した公開鍵で共通鍵を暗号化
             sharedKey = rsa->Encrypt(pubKey, aesKey);
-            CiphserSendServer(sharedKey.data(), sharedKey.size(), CIPHER_PACKET, CIPHER_PACKET_REGISTRY_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
+            CipherSendServer(sharedKey.data(), sharedKey.size(), CIPHER_PACKET, CIPHER_PACKET_REGISTRY_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
          } break;
          case CIPHER_PACKET_REGISTRIED_SHAREDKEY:
 
             // 鍵登録が無事できたかのチェックを要求
             char sendBuf[0];
-            CiphserSendServer(sendBuf, sizeof(sendBuf) / sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_CHECK_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
+            CipherSendServer(sendBuf, sizeof(sendBuf) / sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_CHECK_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
             break;
          case CIPHER_PACKET_SEND_CHECKDATA: {
             // 受信データの型変換
@@ -191,7 +191,7 @@ void TCP_Cipher_Client::CipherProcessing(std::vector<char> _data) {
             std::string encodeData = aes->Encrypt(aesKey, aesKeyByteSize, hashCheckData);
 
             // 受信データのハッシュ化
-            CiphserSendServer(encodeData.data(), encodeData.size(), CIPHER_PACKET, CIPHER_PACKET_CHECK_CHECKDATA_REQUEST, PADDING_DATA, PADDING_DATA);
+            CipherSendServer(encodeData.data(), encodeData.size(), CIPHER_PACKET, CIPHER_PACKET_CHECK_CHECKDATA_REQUEST, PADDING_DATA, PADDING_DATA);
          } break;
          case CIPHER_PACKET_CHECK_SUCCESS:
             iskeychange = true;
@@ -205,7 +205,7 @@ void TCP_Cipher_Client::CipherProcessing(std::vector<char> _data) {
             if (aesKeyByteSize == WrapperOpenSSL::AES_KEY_LEN_256) {
                aes->GenerateKey(aesKey, WrapperOpenSSL::AES_KEY_LEN_256);
                // Serverへ鍵交換を要求
-               if (rsaKeyByteSize == RSA_KEY_2048_BYTE_SIZE) CiphserSendServer(sendBuf, sendDataSize, CIPHER_PACKET, CIPHER_PACKET_CREATE_PUBLICKEY_REQUEST, CIPHER_PACKET_RSA_KEY_SIZE_2048, PADDING_DATA);
+               if (rsaKeyByteSize == RSA_KEY_2048_BYTE_SIZE) CipherSendServer(sendBuf, sendDataSize, CIPHER_PACKET, CIPHER_PACKET_CREATE_PUBLICKEY_REQUEST, CIPHER_PACKET_RSA_KEY_SIZE_2048, PADDING_DATA);
             }
          } break;
          case CIPHER_PACKET_SEND_DATA:

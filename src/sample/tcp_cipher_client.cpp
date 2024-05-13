@@ -13,11 +13,13 @@ int main() {
          client = nullptr;
       }
    }
+
+   // 暗号化通信のための鍵交換処理開始
    client->KeyChangeConnectionStart(OpenSocket::RSA_KEY_2048_BYTE_SIZE, OpenSocket::AES_KEY_LEN_256);
 
    // 暗号化用データの送信処理(仮)
    char sendMsg[6] = "HELLO";
-   int dataSize = client->CiphserSendServer(sendMsg, sizeof(sendMsg) / sizeof(sendMsg[0]), OpenSocket::CIPHER_PACKET, OpenSocket::CIPHER_PACKET_SEND_DATA, OpenSocket::PADDING_DATA, OpenSocket::PADDING_DATA);
+   int dataSize = client->CipherSendServer(sendMsg, sizeof(sendMsg) / sizeof(sendMsg[0]), OpenSocket::CIPHER_PACKET, OpenSocket::CIPHER_PACKET_SEND_DATA, OpenSocket::PADDING_DATA, OpenSocket::PADDING_DATA);
 
    printf("SendData=%d\n", dataSize);
 
@@ -30,7 +32,7 @@ int main() {
          char buf[100];
          std::memcpy(buf, &recvData[0], recvData.size());
          printf("%s\n", buf);
-         client->CiphserSendServer(&recvData[0], recvData.size(), OpenSocket::CIPHER_PACKET, OpenSocket::CIPHER_PACKET_SEND_DATA, OpenSocket::PADDING_DATA, OpenSocket::PADDING_DATA);
+         client->CipherSendServer(&recvData[0], recvData.size(), OpenSocket::CIPHER_PACKET, OpenSocket::CIPHER_PACKET_SEND_DATA, OpenSocket::PADDING_DATA, OpenSocket::PADDING_DATA);
       }
    }
 }

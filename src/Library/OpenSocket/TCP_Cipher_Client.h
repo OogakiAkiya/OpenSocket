@@ -10,7 +10,7 @@ public:
 
    // UpdateのoverrideからDataProcessingのoverrideに修正する。
    virtual void Update() override;
-   int CiphserSendServer(const char* _buf, const int _bufSize, const char _firstClass, const char _secondClass, const char _firstOption, const char _secondOption);  // 通信用の送信処理
+   int CipherSendServer(const char* _buf, const int _bufSize, const char _firstClass, const char _secondClass, const char _firstOption, const char _secondOption);  // 通信用の送信処理
    bool KeyChangeConnectionStart(int _rsaKeyByteSize, int _aesKeyByteSize);
 
 private:
