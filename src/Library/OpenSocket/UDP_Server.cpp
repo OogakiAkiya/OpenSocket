@@ -28,15 +28,15 @@ int UDP_Server::GetRecvDataSize() { return recvDataQueList.size(); }
 
 int UDP_Server::SendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[SEND_BUFFERSIZE];
+   char sendBuf[UDP_SEND_BUFFERSIZE];
 
    try {
       // ヘッダーを付加し送信
-      memcpy(sendBuf, &sequence, sizeof(unsigned int));
-      memcpy(&sendBuf[sizeof(unsigned int)], _buf, _bufSize);
+      memcpy(sendBuf, &sequence, UDP_SEQUENCE_SIZE);
+      memcpy(&sendBuf[UDP_SEQUENCE_SIZE], _buf, _bufSize);
 
       // 送信処理
-      sendDataSize = m_socket->Sendto(_addr, &sendBuf[0], _bufSize + sizeof(unsigned int));
+      sendDataSize = m_socket->Sendto(_addr, &sendBuf[0], _bufSize + UDP_SEQUENCE_SIZE);
 
       // シーケンス番号管理
       sequence++;
@@ -50,17 +50,17 @@ int UDP_Server::SendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, cons
 }
 
 int UDP_Server::SendMultiClient(const std::vector<B_ADDRESS_IN> _addrList, const char* _buf, const int _bufSize) {
-   char sendBuf[SEND_BUFFERSIZE];
+   char sendBuf[UDP_SEND_BUFFERSIZE];
    int sendDataSize = 0;
 
    try {
       // ヘッダーを付加し送信
-      memcpy(sendBuf, &sequence, sizeof(unsigned int));
-      memcpy(&sendBuf[sizeof(unsigned int)], _buf, _bufSize);
+      memcpy(sendBuf, &sequence, UDP_SEQUENCE_SIZE);
+      memcpy(&sendBuf[UDP_SEQUENCE_SIZE], _buf, _bufSize);
 
       for (auto&& addr : _addrList) {
          // 送信処理
-         sendDataSize = m_socket->Sendto(&addr, &sendBuf[0], _bufSize + sizeof(unsigned int));
+         sendDataSize = m_socket->Sendto(&addr, &sendBuf[0], _bufSize + UDP_SEQUENCE_SIZE);
       }
 
       // シーケンス番号管理

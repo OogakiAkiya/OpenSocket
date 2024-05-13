@@ -30,15 +30,15 @@ std::vector<char> UDP_Client::GetRecvData() {
 
 int UDP_Client::SendServer(const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[SEND_BUFFERSIZE];
+   char sendBuf[UDP_SEND_BUFFERSIZE];
 
    try {
       // ヘッダーを付加し送信
-      memcpy(&sendBuf[0], &sequence, sizeof(unsigned int));
-      memcpy(&sendBuf[sizeof(unsigned int)], &_buf[0], _bufSize);
+      memcpy(&sendBuf[0], &sequence, UDP_SEQUENCE_SIZE);
+      memcpy(&sendBuf[UDP_SEQUENCE_SIZE], &_buf[0], _bufSize);
 
       // 送信処理
-      sendDataSize = m_socket->Sendto(&sendBuf[0], _bufSize + sizeof(unsigned int));
+      sendDataSize = m_socket->Sendto(&sendBuf[0], _bufSize + UDP_SEQUENCE_SIZE);
 
       // シーケンス番号管理
       sequence++;

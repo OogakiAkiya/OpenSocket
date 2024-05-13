@@ -27,7 +27,7 @@ void TCP_Cipher_Client::Update() { DataProcessing(); }
 
 int TCP_Cipher_Client::CiphserSendServer(const char* _buf, const int _bufSize, const char _firstClass, const char _secondClass, const char _firstOption, const char _secondOption) {
    int sendDataSize = 0;
-   char sendBuf[SEND_BUFFERSIZE];
+   char sendBuf[TCP_SEND_BUFFERSIZE];
 
    // 暗号化処理付きプロトコル用ヘッダー付与
    std::memcpy(&sendBuf, &_firstClass, sizeof(_firstClass));
@@ -98,7 +98,7 @@ void TCP_Cipher_Client::DataProcessing() {
             // 先頭パケットの解析
             memcpy(&bodySize, &recvData[0], sizeof(int));
             // 先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
-            if (bodySize < 0 || bodySize > BODY_MAX_SIZE) {
+            if (bodySize < 0 || bodySize > TCP_BODY_MAX_SIZE) {
                // TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
                recvData.clear();
                return;

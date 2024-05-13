@@ -33,7 +33,7 @@ std::vector<char> TCP_Client::GetRecvData() {
 
 int TCP_Client::SendServer(const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[SEND_BUFFERSIZE];
+   char sendBuf[TCP_SEND_BUFFERSIZE];
    try {
       // ヘッダーを付加
       memcpy(sendBuf, &_bufSize, sizeof(int));
@@ -74,7 +74,7 @@ void TCP_Client::DataProcessing() {
             // 先頭パケットの解析
             memcpy(&bodySize, &recvData[0], sizeof(int));
             // 先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
-            if (bodySize < 0 || bodySize > BODY_MAX_SIZE) {
+            if (bodySize < 0 || bodySize > TCP_BODY_MAX_SIZE) {
                // TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
                recvData.clear();
                return;

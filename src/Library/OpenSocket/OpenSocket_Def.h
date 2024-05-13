@@ -6,10 +6,14 @@ constexpr int IPV6 = 2;
 constexpr int IPVD = 3;
 constexpr long SEQUENCEMAX = 4200000000;
 constexpr int TCP_BASE_HEADER_SIZE = sizeof(int);
+constexpr int UDP_SEQUENCE_SIZE = sizeof(unsigned int);
 
 constexpr int RECV_PACKET_MAX_SIZE = 4194304;
-constexpr int BODY_MAX_SIZE = 1048576;
-#define SEND_BUFFERSIZE TCP_BASE_HEADER_SIZE + BODY_MAX_SIZE + ENDMARKERSIZE
+constexpr int TCP_BODY_MAX_SIZE = 1048576;
+constexpr int UDP_BODY_MAX_SIZE = 1000;
+
+#define TCP_SEND_BUFFERSIZE TCP_BASE_HEADER_SIZE + TCP_BODY_MAX_SIZE + ENDMARKERSIZE
+#define UDP_SEND_BUFFERSIZE UDP_SEQUENCE_SIZE + UDP_BODY_MAX_SIZE
 
 #define ENDMARKER u8"¥r¥n"
 #define ENDMARKERSIZE strlen(ENDMARKER)
