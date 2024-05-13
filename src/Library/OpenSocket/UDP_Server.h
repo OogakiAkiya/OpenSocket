@@ -14,7 +14,7 @@ public:
    int SendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, const int _bufSize);  // 特定のクライアントに送信する場合使用する
    int SendMultiClient(const std::vector<B_ADDRESS_IN> _addrList, const char* _buf, const int _bufSize);
 
-private:
+protected:
    // メンバ関数
    void DataProcessing();
 

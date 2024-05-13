@@ -1,6 +1,8 @@
 namespace OpenSocket {
 // プログラム中で使用する定数一覧
 constexpr int TCP_CIPHER_HEADER_SIZE = sizeof(char) + sizeof(char) + sizeof(char) + sizeof(char);
+constexpr int UDP_CIPHER_HEADER_SIZE = sizeof(char) + sizeof(char) + sizeof(char) + sizeof(char);
+
 constexpr int CHECK_DATA_SIZE = 64;
 
 // KeyChangeConnectionStartの引数に設定する鍵交換パラメータ

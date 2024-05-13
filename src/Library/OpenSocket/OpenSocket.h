@@ -18,4 +18,6 @@
    #include "../WrapperOpenSSL/WrapperOpenSSL.h"
    #include "TCP_Cipher_Client.h"
    #include "TCP_Cipher_Server.h"
+   #include "UDP_Cipher_Client.h"
+   #include "UDP_Cipher_Server.h"
 #endif

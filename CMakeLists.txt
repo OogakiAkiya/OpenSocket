@@ -30,6 +30,8 @@ list(APPEND SAMPLE_FILES udp_server_Synchronization)
 # 暗号化サンプル
 set(CIPHER_SAMPLE_FILES tcp_cipher_client)
 list(APPEND CIPHER_SAMPLE_FILES tcp_cipher_server)
+list(APPEND CIPHER_SAMPLE_FILES udp_cipher_client)
+list(APPEND CIPHER_SAMPLE_FILES udp_cipher_server)
 
 
 # 暗号化ライブラリも含めたビルド実施

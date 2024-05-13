@@ -13,7 +13,7 @@ public:
    virtual std::vector<char> GetRecvData() override;                          // サーバーから受信したデータを取り出す
    virtual int SendServer(const char* _buf, const int _bufSize) override;     // 特定のサーバーに送信する場合使用する
 
-private:
+protected:
    // メンバ関数
    void DataProcessing();
 
