@@ -98,7 +98,7 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
 
    // ボディーデータ取得
    char bodyData[_data.second.size() - UDP_SEQUENCE_SIZE - UDP_CIPHER_HEADER_SIZE];
-   memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], sizeof(bodyData) / sizeof(bodyData[0]));
+   std::memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], sizeof(bodyData) / sizeof(bodyData[0]));
 
    // UDPの擬似ソケットID作成(IPアドレス,port番号を元にIDを作成する)
    std::string socketID = GetUDPSocketID(&_data.first);

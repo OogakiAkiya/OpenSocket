@@ -32,12 +32,11 @@ int UDP_Server::SendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, cons
 
    try {
       // ヘッダーを付加し送信
-      memcpy(sendBuf, &sequence, UDP_SEQUENCE_SIZE);
-      memcpy(&sendBuf[UDP_SEQUENCE_SIZE], _buf, _bufSize);
+      std::memcpy(sendBuf, &sequence, UDP_SEQUENCE_SIZE);
+      std::memcpy(&sendBuf[UDP_SEQUENCE_SIZE], _buf, _bufSize);
 
       // 送信処理
       sendDataSize = m_socket->Sendto(_addr, &sendBuf[0], _bufSize + UDP_SEQUENCE_SIZE);
-
       // シーケンス番号管理
       sequence++;
       if (sequence > SEQUENCEMAX) { sequence = 0; }

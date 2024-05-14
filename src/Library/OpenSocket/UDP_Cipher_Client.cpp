@@ -45,7 +45,7 @@ int UDP_Cipher_Client::CipherSendServer(const char* _buf, const int _bufSize, co
          std::string encodeData = aes->Encrypt(aesKey, aesKeyByteSize, plainData);
 
          // 送信データの付与
-         memcpy(&sendBuf[sendDataSize], encodeData.data(), encodeData.size());
+         std::memcpy(&sendBuf[sendDataSize], encodeData.data(), encodeData.size());
          sendDataSize += encodeData.size();
 
       } else {
@@ -110,7 +110,7 @@ void UDP_Cipher_Client::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
 
    // ボディーデータ作成
    char bodyData[_data.second.size() - UDP_SEQUENCE_SIZE - UDP_CIPHER_HEADER_SIZE];
-   memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], sizeof(bodyData) / sizeof(bodyData[0]));
+   std::memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], sizeof(bodyData) / sizeof(bodyData[0]));
    // 暗号化ヘッダーの第二セグメントを参照し分岐処理
    switch (_data.second[UDP_SEQUENCE_SIZE + sizeof(CIPHER_PACKET)]) {
       case CIPHER_PACKET_SEND_PUBLICKEY: {

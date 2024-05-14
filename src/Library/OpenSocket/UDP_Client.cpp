@@ -15,7 +15,7 @@ std::shared_ptr<BaseClient> UDP_Client::GetInstance(const std::string _addrs, co
    temp->m_socket = std::make_shared<BaseSocket>();
    temp->m_socket->Init(_addrs, _port);                // IPアドレスとポート番号の設定
    SwitchIpv(temp->m_socket, _ipv);                    // IPvの設定
-   temp->m_socket->SetProtocol_UDP();                  // TCP通信に設定
+   temp->m_socket->SetProtocol_UDP();                  // UDP通信に設定
    if (!temp->m_socket->AddressSet()) return nullptr;  // ソケット生成
    if (_asynchronous) temp->m_socket->SetAsynchronous();
    return temp;
@@ -34,8 +34,8 @@ int UDP_Client::SendServer(const char* _buf, const int _bufSize) {
 
    try {
       // ヘッダーを付加し送信
-      memcpy(&sendBuf[0], &sequence, UDP_SEQUENCE_SIZE);
-      memcpy(&sendBuf[UDP_SEQUENCE_SIZE], &_buf[0], _bufSize);
+      std::memcpy(&sendBuf[0], &sequence, UDP_SEQUENCE_SIZE);
+      std::memcpy(&sendBuf[UDP_SEQUENCE_SIZE], &_buf[0], _bufSize);
 
       // 送信処理
       sendDataSize = m_socket->Sendto(&sendBuf[0], _bufSize + UDP_SEQUENCE_SIZE);
@@ -64,7 +64,7 @@ void UDP_Client::DataProcessing() {
 
    if (dataSize > 0) {
       addData.second.resize(dataSize);
-      memcpy(&addData.second[0], &buf[0], dataSize);
+      std::memcpy(&addData.second[0], &buf[0], dataSize);
       recvDataQueList.push(addData);
    }
 }

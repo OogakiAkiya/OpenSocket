@@ -44,14 +44,14 @@ int TCP_Cipher_Client::CipherSendServer(const char* _buf, const int _bufSize, co
       std::string encodeData = aes->Encrypt(aesKey, aesKeyByteSize, plainData);
 
       // 送信データの付与
-      memcpy(&sendBuf[sendDataSize], encodeData.data(), encodeData.size());
+      std::memcpy(&sendBuf[sendDataSize], encodeData.data(), encodeData.size());
       sendDataSize += encodeData.size();
 
       // 暗号化したデータの送信
       return TCP_Client::SendServer(sendBuf, sendDataSize);
    }
    // 送信データの付与
-   memcpy(&sendBuf[sendDataSize], _buf, _bufSize);
+   std::memcpy(&sendBuf[sendDataSize], _buf, _bufSize);
    sendDataSize += _bufSize;
 
    // 通常フローの送信処理
@@ -90,13 +90,13 @@ void TCP_Cipher_Client::DataProcessing() {
       // 受信データを格納
       int nowSize = recvData.size();
       recvData.resize(nowSize + dataSize);
-      memcpy((char*)&recvData[nowSize], &buf[0], dataSize);
+      std::memcpy((char*)&recvData[nowSize], &buf[0], dataSize);
 
       while (recvData.size() > TCP_BASE_HEADER_SIZE) {
          int bodySize;
          try {
             // 先頭パケットの解析
-            memcpy(&bodySize, &recvData[0], sizeof(int));
+            std::memcpy(&bodySize, &recvData[0], sizeof(int));
             // 先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
             if (bodySize < 0 || bodySize > TCP_BODY_MAX_SIZE) {
                // TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
@@ -114,7 +114,7 @@ void TCP_Cipher_Client::DataProcessing() {
 
                std::vector<char> addData;
                addData.resize(bodySize);
-               memcpy(&addData[0], &recvData[TCP_BASE_HEADER_SIZE], bodySize);
+               std::memcpy(&addData[0], &recvData[TCP_BASE_HEADER_SIZE], bodySize);
                CipherProcessing(addData);
                recvData.erase(recvData.begin(), recvData.begin() + bodySize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
             }
@@ -155,7 +155,7 @@ void TCP_Cipher_Client::DataProcessing() {
 void TCP_Cipher_Client::CipherProcessing(std::vector<char> _data) {
    if (_data.size() - TCP_CIPHER_HEADER_SIZE < 0) return;
    char bodyData[_data.size() - TCP_CIPHER_HEADER_SIZE];
-   memcpy(&bodyData[0], &_data[TCP_CIPHER_HEADER_SIZE], _data.size() - TCP_CIPHER_HEADER_SIZE);
+   std::memcpy(&bodyData[0], &_data[TCP_CIPHER_HEADER_SIZE], _data.size() - TCP_CIPHER_HEADER_SIZE);
 
    // 暗号化プロトコル用のパケット解析
    if (_data[0] == CIPHER_PACKET) {

@@ -61,14 +61,14 @@ int TCP_Cipher_Server::CipherSendOnlyClient(const int _socket, const char* _buf,
       std::string encodeData = aes->Encrypt(aesKeyList[_socket], aesKeyList[_socket].size(), plainData);
 
       // 送信データの付与
-      memcpy(&sendBuf[sendDataSize], encodeData.data(), encodeData.size());
+      std::memcpy(&sendBuf[sendDataSize], encodeData.data(), encodeData.size());
       sendDataSize += encodeData.size();
 
       // 暗号化したデータの送信
       return TCP_Server::SendOnlyClient(_socket, sendBuf, sendDataSize);
    }
    // 送信データの付与
-   memcpy(&sendBuf[sendDataSize], _buf, _bufSize);
+   std::memcpy(&sendBuf[sendDataSize], _buf, _bufSize);
    sendDataSize += _bufSize;
 
    return TCP_Server::SendOnlyClient(_socket, sendBuf, sendDataSize);
@@ -93,13 +93,13 @@ void TCP_Cipher_Server::DataProcessing() {
          // 受信データを格納
          int nowSize = recvDataMap[socket].size();
          recvDataMap[socket].resize(nowSize + dataSize);
-         memcpy((char*)&recvDataMap[socket][nowSize], &buf[0], dataSize);
+         std::memcpy((char*)&recvDataMap[socket][nowSize], &buf[0], dataSize);
 
          while (recvDataMap[socket].size() > TCP_CIPHER_HEADER_SIZE) {
             int bodySize;
             try {
                // 先頭パケットの解析
-               memcpy(&bodySize, &recvDataMap[(B_SOCKET)socket][0], sizeof(int));
+               std::memcpy(&bodySize, &recvDataMap[(B_SOCKET)socket][0], sizeof(int));
 
                // 先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
                if (bodySize < 0 || bodySize > TCP_BODY_MAX_SIZE) {
@@ -120,7 +120,7 @@ void TCP_Cipher_Server::DataProcessing() {
                   std::pair<B_SOCKET, std::vector<char>> addData;
                   addData.first = socket;
                   addData.second.resize(bodySize);
-                  memcpy(&addData.second[0], &recvDataMap[socket][TCP_CIPHER_HEADER_SIZE], bodySize);
+                  std::memcpy(&addData.second[0], &recvDataMap[socket][TCP_CIPHER_HEADER_SIZE], bodySize);
 
                   CipherProcessing(addData);
                   recvDataMap[socket].erase(recvDataMap[socket].begin(), recvDataMap[socket].begin() + bodySize + TCP_CIPHER_HEADER_SIZE + ENDMARKERSIZE);
@@ -185,7 +185,7 @@ void TCP_Cipher_Server::DataProcessing() {
 void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> _data) {
    if (_data.second.size() - TCP_CIPHER_HEADER_SIZE < 0) return;
    char bodyData[_data.second.size() - TCP_CIPHER_HEADER_SIZE];
-   memcpy(&bodyData[0], &_data.second[TCP_CIPHER_HEADER_SIZE], _data.second.size() - TCP_CIPHER_HEADER_SIZE);
+   std::memcpy(&bodyData[0], &_data.second[TCP_CIPHER_HEADER_SIZE], _data.second.size() - TCP_CIPHER_HEADER_SIZE);
 
    // 暗号化プロトコル用のパケット解析
    if (_data.second[0] == CIPHER_PACKET) {
@@ -262,7 +262,7 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
             std::pair<B_SOCKET, std::vector<char>> addData;
             addData.first = _data.first;
             addData.second.resize(decodeData.size());
-            memcpy(&addData.second[0], decodeData.data(), decodeData.size());
+            std::memcpy(&addData.second[0], decodeData.data(), decodeData.size());
 
             recvDataQueList.push(addData);
             break;

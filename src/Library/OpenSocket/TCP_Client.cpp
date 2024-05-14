@@ -36,13 +36,13 @@ int TCP_Client::SendServer(const char* _buf, const int _bufSize) {
    char sendBuf[TCP_SEND_BUFFERSIZE];
    try {
       // ヘッダーを付加
-      memcpy(sendBuf, &_bufSize, sizeof(int));
+      std::memcpy(sendBuf, &_bufSize, sizeof(int));
 
       // データの付与
-      memcpy(&sendBuf[TCP_BASE_HEADER_SIZE], _buf, _bufSize);
+      std::memcpy(&sendBuf[TCP_BASE_HEADER_SIZE], _buf, _bufSize);
 
       // エンドマーカーを付与
-      memcpy(&sendBuf[TCP_BASE_HEADER_SIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
+      std::memcpy(&sendBuf[TCP_BASE_HEADER_SIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
       // 送信
       sendDataSize = m_socket->Send(sendBuf, _bufSize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
@@ -66,13 +66,13 @@ void TCP_Client::DataProcessing() {
       // 受信データを格納
       int nowSize = recvData.size();
       recvData.resize(nowSize + dataSize);
-      memcpy((char*)&recvData[nowSize], &buf[0], dataSize);
+      std::memcpy((char*)&recvData[nowSize], &buf[0], dataSize);
 
       while (recvData.size() > TCP_BASE_HEADER_SIZE) {
          int bodySize;
          try {
             // 先頭パケットの解析
-            memcpy(&bodySize, &recvData[0], sizeof(int));
+            std::memcpy(&bodySize, &recvData[0], sizeof(int));
             // 先頭パケットが想定しているよりも小さいまたは大きいパケットの場合は不正パケットとして解釈する。
             if (bodySize < 0 || bodySize > TCP_BODY_MAX_SIZE) {
                // TODO:不正パケットとみなした場合パケットをすべて削除しているが何かいい手がないか考える
@@ -92,7 +92,7 @@ void TCP_Client::DataProcessing() {
                // データの追加処理
                std::vector<char> addData;
                addData.resize(bodySize);
-               memcpy(&addData[0], &recvData[TCP_BASE_HEADER_SIZE], bodySize);
+               std::memcpy(&addData[0], &recvData[TCP_BASE_HEADER_SIZE], bodySize);
                recvDataQueList.push(addData);
                recvData.erase(recvData.begin(), recvData.begin() + bodySize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
             }
