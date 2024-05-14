@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.13)
 project(OpenSocket)
 
 # C++バージョン指定
-add_definitions( -std=c++11 -Wall)
+add_definitions( -std=c++11 -Wall -O2)
 
 # ビルドに必要なopensslの検出
 find_package(OpenSSL 3.0 REQUIRED)
