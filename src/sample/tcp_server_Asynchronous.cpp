@@ -9,10 +9,13 @@ int main() {
 
       // データ送信処理
       while (server->GetRecvDataSize() > 0) {
+         // 受信データ取得
          std::pair<int, std::vector<char>> recvData = server->GetRecvData();
-         printf("Recv=%s\n", &recvData.second[0]);
+         std::cout << "Recv=" << recvData.second.data() << std::endl;
+
+         // 送信処理
          int sendDataSize = server->SendOnlyClient(recvData.first, &recvData.second[0], recvData.second.size());
-         printf("Send=%d\n", sendDataSize);
+         std::cout << "SendDataSize=" << sendDataSize << std::endl;
       }
    }
 }

@@ -9,13 +9,14 @@ int main() {
    while (1) {
       server->Update();
 
-      // データ送信処理
-
       while (server->GetRecvDataSize() > 0) {
+         // 受信データ取得
          std::pair<int, std::vector<char>> recvData = server->GetRecvData();
-         printf("Recv=%s\n", &recvData.second[0]);
+         std::cout << "Recv=" << recvData.second.data() << std::endl;
+
+         // 送信処理
          int sendDataSize = server->CipherSendOnlyClient(recvData.first, &recvData.second[0], recvData.second.size(), OpenSocket::CIPHER_PACKET, OpenSocket::CIPHER_PACKET_SEND_DATA, OpenSocket::PADDING_DATA, OpenSocket::PADDING_DATA);
-         printf("Send=%d\n", sendDataSize);
+         std::cout << "SendDataSize=" << sendDataSize << std::endl;
       }
    }
 }

@@ -16,7 +16,7 @@ int main() {
    // 送信処理(仮)
    char sendMsg[6] = "HELLO";
    int dataSize = client->SendServer(sendMsg, sizeof(sendMsg));
-   printf("SendData=%d\n", dataSize);
+   std::cout << "SendDataSize=" << dataSize << std::endl;
 
    while (1) {
       FD_ZERO(&readfds);
@@ -27,12 +27,13 @@ int main() {
 
       client->Update();
       if (client->GetRecvDataSize() > 0) {
-         // 受信処理
+         // 受信データ取得
          std::vector<char> recvData = client->GetRecvData();
-         char buf[100];
-         std::memcpy(buf, &recvData[0], recvData.size());
-         printf("%s\n", buf);
-         client->SendServer(&recvData[0], recvData.size());
+         std::cout << "Recv=" << recvData.data() << std::endl;
+
+         // 送信処理
+         int sendDataSize = client->SendServer(&recvData[0], recvData.size());
+         std::cout << "SendDataSize=" << sendDataSize << std::endl;
       }
    }
 }
