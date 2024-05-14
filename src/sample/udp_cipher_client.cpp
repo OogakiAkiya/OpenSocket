@@ -8,7 +8,7 @@ int main() {
    // 暗号化通信のための鍵交換処理開始
    if (!client->KeyChangeConnectionStart(OpenSocket::RSA_KEY_2048_BYTE_SIZE, OpenSocket::AES_KEY_LEN_256)) {
       std::cout << "Key change faild" << std::endl;
-      return 0;
+      return 1;
    }
 
    char sendMsg[6] = "HELLO";
