@@ -13,6 +13,7 @@
    #include <thread>
 
 #else
+   #include <arpa/inet.h>
    #include <netdb.h>
    #include <netinet/in.h>
    #include <sys/ioctl.h>
@@ -22,7 +23,6 @@
    #include <cstring>
    #include <fstream>
    #include <memory>
-   #include <unordered_map>
 
 #endif
 #include <algorithm>

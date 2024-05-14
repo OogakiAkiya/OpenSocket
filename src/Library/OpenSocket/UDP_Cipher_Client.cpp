@@ -19,7 +19,7 @@ std::shared_ptr<UDP_Cipher_Client> UDP_Cipher_Client::GetInstance(const std::str
    temp->m_socket = std::make_shared<BaseSocket>();
    temp->m_socket->Init(_addrs, _port);                // IPアドレスとポート番号の設定
    SwitchIpv(temp->m_socket, _ipv);                    // IPvの設定
-   temp->m_socket->SetProtocol_UDP();                  // TCP通信に設定
+   temp->m_socket->SetProtocol_UDP();                  // UDP通信に設定
    if (!temp->m_socket->AddressSet()) return nullptr;  // ソケット生成
    if (_asynchronous) temp->m_socket->SetAsynchronous();
    return temp;
@@ -37,8 +37,21 @@ int UDP_Cipher_Client::CipherSendServer(const char* _buf, const int _bufSize, co
       std::memcpy(&sendBuf[sizeof(_firstClass) + sizeof(_secondClass) + sizeof(_firstOption)], &_secondOption, sizeof(_secondOption));
       sendDataSize = sizeof(_firstClass) + sizeof(_secondClass) + sizeof(_firstOption) + sizeof(_secondOption);
 
-      std::memcpy(&sendBuf[sendDataSize], &_buf[0], _bufSize);
-      sendDataSize += _bufSize;
+      // 送信データの付与(共通鍵交換済みの場合)
+      if (iskeychange) {
+         // データの型変換
+         std::string plainData(_buf, _bufSize);
+         // データの暗号化
+         std::string encodeData = aes->Encrypt(aesKey, aesKeyByteSize, plainData);
+
+         // 送信データの付与
+         memcpy(&sendBuf[sendDataSize], encodeData.data(), encodeData.size());
+         sendDataSize += encodeData.size();
+
+      } else {
+         std::memcpy(&sendBuf[sendDataSize], &_buf[0], _bufSize);
+         sendDataSize += _bufSize;
+      }
 
       // 送信処理
       sendDataSize = UDP_Client::SendServer(&sendBuf[0], sendDataSize);
@@ -91,14 +104,80 @@ void UDP_Cipher_Client::DataProcessing() {
 }
 
 void UDP_Cipher_Client::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<char>> _data) {
+   // シーケンス番号作成
    unsigned int sequence;
    std::memcpy(&sequence, &_data.second[0], UDP_SEQUENCE_SIZE);
 
-   // 暗号化ヘッダーの除去したデータの作成
-   std::vector<char> recvData;
-   recvData.resize(_data.second.size() - UDP_CIPHER_HEADER_SIZE);
-   std::memcpy(&recvData[0], &sequence, UDP_SEQUENCE_SIZE);
-   std::memcpy(&recvData[UDP_SEQUENCE_SIZE], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], _data.second.size() - UDP_CIPHER_HEADER_SIZE - UDP_SEQUENCE_SIZE);
-   recvDataQueList.push({_data.first, recvData});
+   // ボディーデータ作成
+   char bodyData[_data.second.size() - UDP_SEQUENCE_SIZE - UDP_CIPHER_HEADER_SIZE];
+   memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], sizeof(bodyData) / sizeof(bodyData[0]));
+   // 暗号化ヘッダーの第二セグメントを参照し分岐処理
+   switch (_data.second[UDP_SEQUENCE_SIZE + sizeof(CIPHER_PACKET)]) {
+      case CIPHER_PACKET_SEND_PUBLICKEY: {
+         // 公開鍵型変換
+         std::string pubKey(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
+
+         // 暗号化した公開鍵の暗号化
+         std::string sharedKey;
+         // 共通鍵の作成
+         aes->GenerateKey(aesKey, aesKeyByteSize);
+
+         // 受信した公開鍵で共通鍵を暗号化
+         sharedKey = rsa->Encrypt(pubKey, aesKey);
+         CipherSendServer(sharedKey.data(), sharedKey.size(), CIPHER_PACKET, CIPHER_PACKET_REGISTRY_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
+      } break;
+
+      case CIPHER_PACKET_REGISTRIED_SHAREDKEY:
+         // 鍵登録が無事できたかのチェックを要求
+         char sendBuf[0];
+         CipherSendServer(sendBuf, sizeof(sendBuf) / sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_CHECK_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
+         break;
+
+      case CIPHER_PACKET_SEND_CHECKDATA: {
+         // 受信データの型変換
+         std::string checkData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
+         std::string decodeData = aes->Decrypt(aesKey, aesKeyByteSize, checkData);
+
+         // サーバから送信されたチェックデータのハッシュ化
+         std::string hashCheckData = WrapperOpenSSL::createMD5Hash(decodeData);
+
+         // ハッシュ値の暗号化
+         std::string encodeData = aes->Encrypt(aesKey, aesKeyByteSize, hashCheckData);
+
+         // 受信データのハッシュ化
+         CipherSendServer(encodeData.data(), encodeData.size(), CIPHER_PACKET, CIPHER_PACKET_CHECK_CHECKDATA_REQUEST, PADDING_DATA, PADDING_DATA);
+      } break;
+
+      case CIPHER_PACKET_CHECK_SUCCESS:
+         iskeychange = true;
+         break;
+
+      case CIPHER_PACKET_CHECK_FAILD: {
+         // もう一度鍵交換から挑戦
+         int sendDataSize = 0;
+         char sendBuf[0];
+
+         // 共通鍵の作成
+         if (aesKeyByteSize == WrapperOpenSSL::AES_KEY_LEN_256) {
+            aes->GenerateKey(aesKey, WrapperOpenSSL::AES_KEY_LEN_256);
+            // Serverへ鍵交換を要求
+            if (rsaKeyByteSize == RSA_KEY_2048_BYTE_SIZE) CipherSendServer(sendBuf, sendDataSize, CIPHER_PACKET, CIPHER_PACKET_CREATE_PUBLICKEY_REQUEST, CIPHER_PACKET_RSA_KEY_SIZE_2048, PADDING_DATA);
+         }
+      } break;
+      case CIPHER_PACKET_SEND_DATA:
+         std::string encodeData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
+         // データの復号処理
+         std::string decodeData = aes->Decrypt(aesKey, aesKeyByteSize, encodeData);
+
+         // 暗号化ヘッダーの除去したデータの作成
+         std::vector<char> addData;
+         addData.resize(UDP_SEQUENCE_SIZE + decodeData.size());
+         std::memcpy(&addData[0], &sequence, UDP_SEQUENCE_SIZE);
+         std::memcpy(&addData[UDP_SEQUENCE_SIZE], decodeData.data(), decodeData.size());
+
+         // データの追加処理
+         recvDataQueList.push({_data.first, addData});
+         break;
+   }
 }
 }  // namespace OpenSocket

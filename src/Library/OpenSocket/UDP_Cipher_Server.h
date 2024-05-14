@@ -15,11 +15,18 @@ public:
 private:
    void DataProcessing();
    void CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<char>> _data);
+   std::string GetUDPSocketID(const B_ADDRESS_IN* _addr);
+
+   // 公開鍵暗号
    std::shared_ptr<WrapperOpenSSL::Crepto_RSA> rsa = std::make_shared<WrapperOpenSSL::Crepto_RSA>();
+   std::unordered_map<std::string, std::string> rsaKeyList;
+
+   // 共通鍵暗号
    std::shared_ptr<WrapperOpenSSL::Crepto_AES> aes = std::make_shared<WrapperOpenSSL::Crepto_AES>();
-   std::unordered_map<B_SOCKET, std::string> rsaKeyList;
-   std::unordered_map<B_SOCKET, std::vector<unsigned char>> aesKeyList;
-   std::unordered_map<B_SOCKET, std::string> checkDataList;
+   std::unordered_map<std::string, std::vector<unsigned char>> aesKeyList;
+
+   // チェックデータリスト
+   std::unordered_map<std::string, std::string> checkDataList;
 };
 }  // namespace OpenSocket
 #endif
