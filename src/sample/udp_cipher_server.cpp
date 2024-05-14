@@ -9,10 +9,10 @@ int main() {
       if (server->GetRecvDataSize() > 0) {
          std::pair<B_ADDRESS_IN, std::vector<char>> recvData = server->GetRecvData();
          unsigned int sequence;
-         std::memcpy(&sequence, &recvData.second[0], sizeof(unsigned int));
-         printf("Recv(%d)=%s\n", sequence, &recvData.second[sizeof(unsigned int)]);
-         int sendDataSize = server->CipherSendOnlyClient(&recvData.first, &recvData.second[sizeof(unsigned int)], recvData.second.size() - sizeof(unsigned int), OpenSocket::CIPHER_PACKET, OpenSocket::CIPHER_PACKET_SEND_DATA,
-                                                         OpenSocket::PADDING_DATA, OpenSocket::PADDING_DATA);
+         std::memcpy(&sequence, &recvData.second[0], OpenSocket::UDP_SEQUENCE_SIZE);
+         printf("Recv(%d)=%s\n", sequence, &recvData.second[OpenSocket::UDP_SEQUENCE_SIZE]);
+         int sendDataSize = server->CipherSendOnlyClient(&recvData.first, &recvData.second[OpenSocket::UDP_SEQUENCE_SIZE], recvData.second.size() - OpenSocket::UDP_SEQUENCE_SIZE, OpenSocket::CIPHER_PACKET,
+                                                         OpenSocket::CIPHER_PACKET_SEND_DATA, OpenSocket::PADDING_DATA, OpenSocket::PADDING_DATA);
          printf("Send=%d\n", sendDataSize);
       }
    }

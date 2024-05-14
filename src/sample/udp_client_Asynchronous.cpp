@@ -12,10 +12,10 @@ int main() {
       if (client->GetRecvDataSize() > 0) {
          std::vector<char> recvData = client->GetRecvData();
          unsigned int sequence;
-         std::memcpy(&sequence, &recvData[0], sizeof(unsigned int));
-         printf("Recv(%d)=%s\n", sequence, &recvData[sizeof(unsigned int)]);
+         std::memcpy(&sequence, &recvData[0], OpenSocket::UDP_SEQUENCE_SIZE);
+         printf("Recv(%d)=%s\n", sequence, &recvData[OpenSocket::UDP_SEQUENCE_SIZE]);
 
-         len = client->SendServer(&recvData[sizeof(unsigned int)], recvData.size() - sizeof(unsigned int));
+         len = client->SendServer(&recvData[OpenSocket::UDP_SEQUENCE_SIZE], recvData.size() - OpenSocket::UDP_SEQUENCE_SIZE);
       }
    }
 }
