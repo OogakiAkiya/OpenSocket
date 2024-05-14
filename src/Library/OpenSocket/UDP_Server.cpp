@@ -76,18 +76,37 @@ int UDP_Server::SendMultiClient(const std::vector<B_ADDRESS_IN> _addrList, const
 void UDP_Server::DataProcessing() {
    // ファイルディスクリプタが設定されておりビットフラグが立っていない場合抜けるようにする
    if (fds != nullptr) {
+      // 同期通信用の受信処理
       if (!FD_ISSET(m_socket->GetSocket(), fds)) { return; }
+      char buf[RECV_PACKET_MAX_SIZE];
+      std::pair<B_ADDRESS_IN, std::vector<char>> addData;
+
+      // 受信処理
+      int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], RECV_PACKET_MAX_SIZE, 0);
+
+      if (dataSize > 0) {
+         addData.second.resize(dataSize);
+         memcpy(&addData.second[0], &buf[0], dataSize);
+         recvDataQueList.push(addData);
+      }
+      return;
    }
-
-   std::pair<B_ADDRESS_IN, std::vector<char>> addData;
+   // 非同期通信用の受信ループ
    char buf[RECV_PACKET_MAX_SIZE];
+   while (true) {
+      std::pair<B_ADDRESS_IN, std::vector<char>> addData;
 
-   // 受信処理
-   int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], RECV_PACKET_MAX_SIZE, 0);
-   if (dataSize > 0) {
-      addData.second.resize(dataSize);
-      memcpy(&addData.second[0], &buf[0], dataSize);
-      recvDataQueList.push(addData);
+      // 受信処理
+      int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], RECV_PACKET_MAX_SIZE, 0);
+
+      if (dataSize > 0) {
+         addData.second.resize(dataSize);
+         memcpy(&addData.second[0], &buf[0], dataSize);
+         recvDataQueList.push(addData);
+      } else {
+         // 受信できるデータがなくなったのでループを抜ける
+         break;
+      }
    }
 }
 
