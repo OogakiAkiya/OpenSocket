@@ -1,4 +1,4 @@
-# cmakeバージョン指定
+﻿# cmakeバージョン指定
 cmake_minimum_required(VERSION 3.13)
 
 # ビルド対象ファイル検索

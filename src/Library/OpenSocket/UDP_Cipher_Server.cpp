@@ -1,4 +1,4 @@
-#include "OpenSocket_Cipher_Def.h"
+﻿#include "OpenSocket_Cipher_Def.h"
 #include "OpenSocket_Def.h"
 #include "OpenSocket_STD.h"
 #include "Utility.h"

@@ -1,4 +1,4 @@
-#ifndef TCP_CIPHER_SERVER_h
+﻿#ifndef TCP_CIPHER_SERVER_h
 #define TCP_CIPHER_SERVER_h
 
 namespace OpenSocket {

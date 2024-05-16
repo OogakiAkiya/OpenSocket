@@ -1,4 +1,4 @@
-#ifndef TCP_CLIENT_h
+﻿#ifndef TCP_CLIENT_h
 #define TCP_CLIENT_h
 
 namespace OpenSocket {

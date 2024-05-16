@@ -1,4 +1,4 @@
-#ifndef UDP_CIPHER_CLIENT_h
+﻿#ifndef UDP_CIPHER_CLIENT_h
 #define UDP_CIPHER_CLIENT_h
 
 namespace OpenSocket {

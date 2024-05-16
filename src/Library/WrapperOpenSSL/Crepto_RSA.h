@@ -1,4 +1,4 @@
-#ifndef CREPTO_RSA_h
+﻿#ifndef CREPTO_RSA_h
 #define CREPTO_RSA_h
 
 namespace WrapperOpenSSL {

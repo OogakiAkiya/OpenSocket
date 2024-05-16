@@ -1,4 +1,4 @@
-namespace OpenSocket {
+﻿namespace OpenSocket {
 
 // プログラム中で使用する定数一覧
 constexpr int IPV4 = 1;

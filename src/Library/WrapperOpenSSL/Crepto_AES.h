@@ -1,4 +1,4 @@
-#ifndef CREPTO_AES_h
+﻿#ifndef CREPTO_AES_h
 #define CREPTO_AES_h
 
 namespace WrapperOpenSSL {

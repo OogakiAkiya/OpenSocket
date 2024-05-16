@@ -1,4 +1,4 @@
-#ifndef WRAPPEROPENSSL_UTILITY_H
+﻿#ifndef WRAPPEROPENSSL_UTILITY_H
 #define WRAPPEROPENSSL_UTILITY_H
 
 namespace WrapperOpenSSL {

@@ -1,4 +1,4 @@
-#ifndef OPENSOCKET_UTILITY_H
+﻿#ifndef OPENSOCKET_UTILITY_H
 #define OPENSOCKET_UTILITY_H
 
 namespace OpenSocket {

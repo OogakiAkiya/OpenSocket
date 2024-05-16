@@ -1,4 +1,4 @@
-# CMakeのバージョンを設定
+﻿# CMakeのバージョンを設定
 cmake_minimum_required(VERSION 3.13)
 
 # プロジェクト名
