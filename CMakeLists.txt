@@ -4,8 +4,12 @@ cmake_minimum_required(VERSION 3.13)
 # プロジェクト名
 project(OpenSocket)
 
-# C++バージョン指定
-add_definitions( -std=c++11 -Wall)
+# コンパイルの追加オプション定義
+if (WIN32)
+	add_definitions(/W4 /std:c++11)
+else()
+	add_definitions(-std=c++11 -Wall -O2)
+endif()
 
 # ビルドに必要なopensslの検出
 find_package(OpenSSL 3.0 QUIET)
@@ -18,7 +22,6 @@ if(OPENSSL_FOUND)
 else()
 	message(WARNING "OpenSSL Not Found")
 	message(WARNING "If you want to use the encryption function, please install OpenSSL3.0 or higher.")
-
 endif()
 
 # 非暗号化サンプルファイル
