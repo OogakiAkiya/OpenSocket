@@ -21,6 +21,9 @@ protected:
    // メンバ変数
    unsigned int sequence = 0;                                               // シーケンス番号
    std::queue<std::pair<B_ADDRESS_IN, std::vector<char>>> recvDataQueList;  // クライアントから受信した情報が入る
+
+   // 送信用バッファ
+   std::vector<char> sendBuf;
 };
 }  // namespace OpenSocket
 #endif

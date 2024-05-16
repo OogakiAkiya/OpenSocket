@@ -30,7 +30,7 @@ std::vector<char> UDP_Client::GetRecvData() {
 
 int UDP_Client::SendServer(const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[UDP_SEND_BUFFERSIZE];
+   if (sendBuf.empty()) sendBuf.resize(UDP_SEQUENCE_SIZE + UDP_BODY_MAX_SIZE);
 
    try {
       // ヘッダーを付加し送信

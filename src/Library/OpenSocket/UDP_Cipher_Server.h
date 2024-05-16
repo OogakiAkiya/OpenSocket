@@ -27,6 +27,9 @@ private:
 
    // チェックデータリスト
    std::unordered_map<std::string, std::string> checkDataList;
+
+   // 送信用バッファ
+   std::vector<char> sendBuf;
 };
 }  // namespace OpenSocket
 #endif

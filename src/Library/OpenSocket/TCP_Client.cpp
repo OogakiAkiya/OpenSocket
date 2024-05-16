@@ -33,10 +33,10 @@ std::vector<char> TCP_Client::GetRecvData() {
 
 int TCP_Client::SendServer(const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[TCP_SEND_BUFFERSIZE];
+   if (sendBuf.empty()) { sendBuf.resize(TCP_BASE_HEADER_SIZE + TCP_BODY_MAX_SIZE + ENDMARKERSIZE); }
    try {
       // ヘッダーを付加
-      std::memcpy(sendBuf, &_bufSize, sizeof(int));
+      std::memcpy(&sendBuf[0], &_bufSize, sizeof(int));
 
       // データの付与
       std::memcpy(&sendBuf[TCP_BASE_HEADER_SIZE], _buf, _bufSize);
@@ -45,7 +45,7 @@ int TCP_Client::SendServer(const char* _buf, const int _bufSize) {
       std::memcpy(&sendBuf[TCP_BASE_HEADER_SIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
       // 送信
-      sendDataSize = m_socket->Send(sendBuf, _bufSize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
+      sendDataSize = m_socket->Send(&sendBuf[0], _bufSize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
    } catch (const std::exception& e) {
       std::cerr << "Exception Error at TCP_Client::SendServer():" << e.what() << std::endl;
       return sendDataSize;

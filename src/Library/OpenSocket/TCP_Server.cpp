@@ -51,11 +51,11 @@ int TCP_Server::GetFileDescriptor(fd_set* _fds) {
 
 int TCP_Server::SendOnlyClient(const int _socket, const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[TCP_SEND_BUFFERSIZE];
+   if (sendBuf.empty()) { sendBuf.resize(TCP_BASE_HEADER_SIZE + TCP_BODY_MAX_SIZE + ENDMARKERSIZE); }
 
    try {
       // ヘッダーを付加
-      std::memcpy(sendBuf, &_bufSize, sizeof(int));
+      std::memcpy(&sendBuf[0], &_bufSize, sizeof(int));
 
       // データの付与
       std::memcpy(&sendBuf[TCP_BASE_HEADER_SIZE], _buf, _bufSize);
@@ -64,7 +64,7 @@ int TCP_Server::SendOnlyClient(const int _socket, const char* _buf, const int _b
       std::memcpy(&sendBuf[TCP_BASE_HEADER_SIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
       for (auto&& clients : clientList) {
-         if (clients->GetSocket() == _socket) sendDataSize = clients->Send(sendBuf, _bufSize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
+         if (clients->GetSocket() == _socket) sendDataSize = clients->Send(&sendBuf[0], _bufSize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE);
       }
    } catch (const std::exception& e) {
       std::cerr << "Exception Error at TCP_Server::SendOnlyClient():" << e.what() << std::endl;
@@ -76,11 +76,10 @@ int TCP_Server::SendOnlyClient(const int _socket, const char* _buf, const int _b
 
 int TCP_Server::SendAllClient(const char* _buf, const int _bufSize) {
    int sendDataSize = 0;
-   char sendBuf[TCP_SEND_BUFFERSIZE];
-
+   if (sendBuf.empty()) { sendBuf.resize(TCP_BASE_HEADER_SIZE + TCP_BODY_MAX_SIZE + ENDMARKERSIZE); }
    try {
       // ヘッダーを付加
-      std::memcpy(sendBuf, &_bufSize, sizeof(int));
+      std::memcpy(&sendBuf[0], &_bufSize, sizeof(int));
 
       // データの付与
       std::memcpy(&sendBuf[TCP_BASE_HEADER_SIZE], _buf, _bufSize);
@@ -88,7 +87,7 @@ int TCP_Server::SendAllClient(const char* _buf, const int _bufSize) {
       // エンドマーカーを付与
       std::memcpy(&sendBuf[TCP_BASE_HEADER_SIZE + _bufSize], ENDMARKER, ENDMARKERSIZE);
 
-      for (auto&& clients : clientList) { sendDataSize = clients->Send(sendBuf, _bufSize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE); }
+      for (auto&& clients : clientList) { sendDataSize = clients->Send(&sendBuf[0], _bufSize + TCP_BASE_HEADER_SIZE + ENDMARKERSIZE); }
    } catch (const std::exception& e) {
       std::cerr << "Exception Error at TCP_Server::SendAllClient():" << e.what() << std::endl;
       return sendDataSize;

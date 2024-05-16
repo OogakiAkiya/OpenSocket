@@ -21,6 +21,7 @@ protected:
    std::unordered_map<int, std::vector<char>> recvDataMap;         // 各クライアントごとのrecvData
    std::vector<std::shared_ptr<BaseSocket>> clientList;            // クライアントのソケット情報を管理
    std::queue<std::pair<int, std::vector<char>>> recvDataQueList;  // クライアントから受信した情報が入る
+   std::vector<char> sendBuf;
 
 private:
    // メンバ関数

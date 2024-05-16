@@ -26,12 +26,12 @@ std::shared_ptr<UDP_Cipher_Client> UDP_Cipher_Client::GetInstance(const std::str
 }
 
 int UDP_Cipher_Client::CipherSendServer(const char* _buf, const int _bufSize, const char _firstClass, const char _secondClass, const char _firstOption, const char _secondOption) {
-   int sendDataSize = 0;
-   char sendBuf[UDP_SEND_BUFFERSIZE];
+   if (sendBuf.empty()) sendBuf.resize(UDP_SEQUENCE_SIZE + UDP_BODY_MAX_SIZE);
 
+   int sendDataSize = 0;
    try {
       // 暗号化処理付きプロトコル用ヘッダー付与
-      std::memcpy(&sendBuf, &_firstClass, sizeof(_firstClass));
+      std::memcpy(&sendBuf[0], &_firstClass, sizeof(_firstClass));
       std::memcpy(&sendBuf[sizeof(_firstClass)], &_secondClass, sizeof(_secondClass));
       std::memcpy(&sendBuf[sizeof(_firstClass) + sizeof(_secondClass)], &_firstOption, sizeof(_firstClass));
       std::memcpy(&sendBuf[sizeof(_firstClass) + sizeof(_secondClass) + sizeof(_firstOption)], &_secondOption, sizeof(_secondOption));

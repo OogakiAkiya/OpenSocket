@@ -26,6 +26,9 @@ private:
    std::shared_ptr<WrapperOpenSSL::Crepto_AES> aes = std::make_shared<WrapperOpenSSL::Crepto_AES>();
    std::vector<unsigned char> aesKey;
    int aesKeyByteSize = 0;
+
+   // 送信用バッファ
+   std::vector<char> sendBuf;
 };
 }  // namespace OpenSocket
 #endif

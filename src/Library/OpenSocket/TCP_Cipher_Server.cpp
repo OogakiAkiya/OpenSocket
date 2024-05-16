@@ -43,11 +43,11 @@ void TCP_Cipher_Server::Update() {
 }
 
 int TCP_Cipher_Server::CipherSendOnlyClient(const int _socket, const char* _buf, const int _bufSize, const char _firstClass, const char _secondClass, const char _firstOption, const char _secondOption) {
+   if (sendBuf.empty()) { sendBuf.resize(TCP_BASE_HEADER_SIZE + TCP_BODY_MAX_SIZE + ENDMARKERSIZE); }
    int sendDataSize = 0;
-   char sendBuf[TCP_SEND_BUFFERSIZE];
 
    // 暗号化処理付きプロトコル用ヘッダー付与
-   std::memcpy(&sendBuf, &_firstClass, sizeof(_firstClass));
+   std::memcpy(&sendBuf[0], &_firstClass, sizeof(_firstClass));
    std::memcpy(&sendBuf[sizeof(_firstClass)], &_secondClass, sizeof(_secondClass));
    std::memcpy(&sendBuf[sizeof(_firstClass) + sizeof(_secondClass)], &_firstOption, sizeof(_firstClass));
    std::memcpy(&sendBuf[sizeof(_firstClass) + sizeof(_secondClass) + sizeof(_firstOption)], &_secondOption, sizeof(_secondOption));
@@ -65,13 +65,13 @@ int TCP_Cipher_Server::CipherSendOnlyClient(const int _socket, const char* _buf,
       sendDataSize += encodeData.size();
 
       // 暗号化したデータの送信
-      return TCP_Server::SendOnlyClient(_socket, sendBuf, sendDataSize);
+      return TCP_Server::SendOnlyClient(_socket, &sendBuf[0], sendDataSize);
    }
    // 送信データの付与
    std::memcpy(&sendBuf[sendDataSize], _buf, _bufSize);
    sendDataSize += _bufSize;
 
-   return TCP_Server::SendOnlyClient(_socket, sendBuf, sendDataSize);
+   return TCP_Server::SendOnlyClient(_socket, &sendBuf[0], sendDataSize);
 }
 
 void TCP_Cipher_Server::DataProcessing() {

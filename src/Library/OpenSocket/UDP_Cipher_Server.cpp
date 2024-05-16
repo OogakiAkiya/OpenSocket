@@ -30,11 +30,11 @@ std::shared_ptr<UDP_Cipher_Server> UDP_Cipher_Server::GetInstance(const std::str
 
 int UDP_Cipher_Server::CipherSendOnlyClient(const B_ADDRESS_IN* _addr, const char* _buf, const int _bufSize, const char _firstClass, const char _secondClass, const char _firstOption, const char _secondOption) {
    int sendDataSize = 0;
-   char sendBuf[UDP_SEND_BUFFERSIZE];
+   if (sendBuf.empty()) sendBuf.resize(UDP_SEQUENCE_SIZE + UDP_BODY_MAX_SIZE);
 
    try {
       // 暗号化処理付きプロトコル用ヘッダー付与
-      std::memcpy(&sendBuf, &_firstClass, sizeof(_firstClass));
+      std::memcpy(&sendBuf[0], &_firstClass, sizeof(_firstClass));
       std::memcpy(&sendBuf[sizeof(_firstClass)], &_secondClass, sizeof(_secondClass));
       std::memcpy(&sendBuf[sizeof(_firstClass) + sizeof(_secondClass)], &_firstOption, sizeof(_firstClass));
       std::memcpy(&sendBuf[sizeof(_firstClass) + sizeof(_secondClass) + sizeof(_firstOption)], &_secondOption, sizeof(_secondOption));
@@ -91,7 +91,6 @@ void UDP_Cipher_Server::DataProcessing() {
       }
       return;
    }
-
    // 非同期通信用の受信ループ
    char buf[RECV_PACKET_MAX_SIZE];
    while (true) {

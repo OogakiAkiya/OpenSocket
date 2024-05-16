@@ -13,8 +13,11 @@ public:
    virtual int SendServer(const char* _buf, const int _bufSize) override;     // 特定のサーバーに送信する場合使用する
 
 protected:
-   // メンバ変数
+   // 受信データ格納用変数
    std::vector<char> recvData;
+
+   // 送信用バッファ
+   std::vector<char> sendBuf;
 
 private:
    // メンバ関数
