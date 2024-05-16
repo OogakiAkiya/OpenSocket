@@ -54,19 +54,20 @@ int TCP_Client::SendServer(const char* _buf, const int _bufSize) {
 }
 
 void TCP_Client::DataProcessing() {
+   if (recvBuf.empty()) recvBuf.resize(RECV_PACKET_MAX_SIZE);
+
    // ファイルディスクリプタが設定されておりビットフラグが立っていない場合抜けるようにする
    if (fds != nullptr) {
       if (!FD_ISSET(m_socket->GetSocket(), fds)) { return; }
    }
 
-   char buf[RECV_PACKET_MAX_SIZE];
-   int dataSize = m_socket->Recv(buf, RECV_PACKET_MAX_SIZE);
+   int dataSize = m_socket->Recv(&recvBuf[0], RECV_PACKET_MAX_SIZE);
 
    if (dataSize > 0) {
       // 受信データを格納
       int nowSize = recvData.size();
       recvData.resize(nowSize + dataSize);
-      std::memcpy((char*)&recvData[nowSize], &buf[0], dataSize);
+      std::memcpy((char*)&recvData[nowSize], &recvBuf[0], dataSize);
 
       while (recvData.size() > TCP_BASE_HEADER_SIZE) {
          int bodySize;

@@ -75,11 +75,12 @@ int TCP_Cipher_Server::CipherSendOnlyClient(const int _socket, const char* _buf,
 }
 
 void TCP_Cipher_Server::DataProcessing() {
+   if (recvBuf.empty()) recvBuf.resize(RECV_PACKET_MAX_SIZE);
+
    // clietnListのindex,socket番号の順で値を格納
    std::list<std::pair<std::shared_ptr<BaseSocket>, int>> deleteList;
 
    for (int i = 0; i < clientList.size(); i++) {
-      char buf[RECV_PACKET_MAX_SIZE];
       int socket = clientList.at(i)->GetSocket();
 
       // fdsがセットされておりsocketにイベントが発生しているか確認し、発生していなければスキップ
@@ -88,12 +89,12 @@ void TCP_Cipher_Server::DataProcessing() {
       }
 
       // データを受信した際はそのバイト数が入り切断された場合は0,ノンブロッキングモードでデータを受信してない間は-1がdataSizeに入る
-      int dataSize = clientList.at(i)->Recv(buf, RECV_PACKET_MAX_SIZE);
+      int dataSize = clientList.at(i)->Recv(&recvBuf[0], RECV_PACKET_MAX_SIZE);
       if (dataSize > 0) {
          // 受信データを格納
          int nowSize = recvDataMap[socket].size();
          recvDataMap[socket].resize(nowSize + dataSize);
-         std::memcpy((char*)&recvDataMap[socket][nowSize], &buf[0], dataSize);
+         std::memcpy((char*)&recvDataMap[socket][nowSize], &recvBuf[0], dataSize);
 
          while (recvDataMap[socket].size() > TCP_CIPHER_HEADER_SIZE) {
             int bodySize;

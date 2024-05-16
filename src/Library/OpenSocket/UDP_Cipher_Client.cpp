@@ -85,34 +85,34 @@ bool UDP_Cipher_Client::KeyChangeConnectionStart(int _rsaKeyByteSize, int _aesKe
    return true;
 }
 void UDP_Cipher_Client::DataProcessing() {
+   if (recvBuf.empty()) recvBuf.resize(RECV_PACKET_MAX_SIZE);
+
    // ファイルディスクリプタが設定されておりビットフラグが立っていない場合抜けるようにする
    if (fds != nullptr) {
       if (!FD_ISSET(m_socket->GetSocket(), fds)) { return; }
       // 同期通信用の受信処理
-      char buf[RECV_PACKET_MAX_SIZE];
       std::pair<B_ADDRESS_IN, std::vector<char>> addData;
 
       // 受信処理
-      int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], RECV_PACKET_MAX_SIZE, 0);
+      int dataSize = m_socket->Recvfrom(&addData.first, &recvBuf[0], RECV_PACKET_MAX_SIZE, 0);
 
       if (dataSize > 0) {
          addData.second.resize(dataSize);
-         std::memcpy(&addData.second[0], &buf[0], dataSize);
+         std::memcpy(&addData.second[0], &recvBuf[0], dataSize);
          CipherProcessing(addData);
       }
       return;
    }
    // 非同期通信用の受信ループ
-   char buf[RECV_PACKET_MAX_SIZE];
    while (1) {
       std::pair<B_ADDRESS_IN, std::vector<char>> addData;
 
       // 受信処理
-      int dataSize = m_socket->Recvfrom(&addData.first, &buf[0], RECV_PACKET_MAX_SIZE, 0);
+      int dataSize = m_socket->Recvfrom(&addData.first, &recvBuf[0], RECV_PACKET_MAX_SIZE, 0);
 
       if (dataSize > 0) {
          addData.second.resize(dataSize);
-         std::memcpy(&addData.second[0], &buf[0], dataSize);
+         std::memcpy(&addData.second[0], &recvBuf[0], dataSize);
          CipherProcessing(addData);
       } else {
          // 受信できるデータがなくなったのでループを抜ける

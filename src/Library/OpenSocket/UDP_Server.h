@@ -24,6 +24,8 @@ protected:
 
    // 送信用バッファ
    std::vector<char> sendBuf;
+   // 受信用バッファ
+   std::vector<char> recvBuf;
 };
 }  // namespace OpenSocket
 #endif

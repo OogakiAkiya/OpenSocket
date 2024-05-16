@@ -18,6 +18,8 @@ protected:
 
    // 送信用バッファ
    std::vector<char> sendBuf;
+   // 受信用バッファ
+   std::vector<char> recvBuf;
 
 private:
    // メンバ関数
