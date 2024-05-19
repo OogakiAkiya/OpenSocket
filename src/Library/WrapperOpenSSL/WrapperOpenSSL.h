@@ -6,4 +6,8 @@
    #include "Crepto_RSA.h"
    #include "WrapperOpenSSL_Utility.h"
 
+   #ifdef _MSC_VER
+      #pragma comment(lib, "Crypt32.lib")
+   #endif
+
 #endif
