@@ -116,11 +116,8 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
    std::memcpy(&sequence, &_data.second[0], UDP_SEQUENCE_SIZE);
 
    // ボディーデータ取得
-#ifdef _MSC_VER
    std::vector<char> bodyData(_data.second.size() - UDP_SEQUENCE_SIZE - UDP_CIPHER_HEADER_SIZE);
-#else
-   char bodyData[_data.second.size() - UDP_SEQUENCE_SIZE - UDP_CIPHER_HEADER_SIZE];
-#endif
+   if (bodyData.empty())return;
    std::memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], sizeof(bodyData) / sizeof(bodyData[0]));
 
    // UDPの擬似ソケットID作成(IPアドレス,port番号を元にIDを作成する)
@@ -145,7 +142,7 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
          break;
       case CIPHER_PACKET_REGISTRY_SHAREDKEY_REQUEST: {
          // 受信データより暗号化プロトコル用のヘッダーを除去しデコードのために型変換
-         std::string cipherData(&bodyData[0]);
+         std::string cipherData(bodyData.begin(), bodyData.end());
 
          // 送られてきた共通鍵をデコード
          std::string sharedKey = rsa->Decrypt(rsaKeyList[socketID], cipherData);
@@ -169,7 +166,7 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
       } break;
       case CIPHER_PACKET_CHECK_CHECKDATA_REQUEST: {
          // 受信データの復号処理
-         std::string encodeData(&bodyData[0]);
+         std::string encodeData(bodyData.begin(), bodyData.end());
          std::string clientHashData = aes->Decrypt(aesKeyList[socketID], aesKeyList[socketID].size(), encodeData);
 
          // サーバ側に登録されているチェックデータをハッシュ化
@@ -193,7 +190,7 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
       } break;
       case CIPHER_PACKET_SEND_DATA:
          // データの復号処理
-         std::string encodeData(&bodyData[0]);
+         std::string encodeData(bodyData.begin(), bodyData.end());
          std::string decodeData = aes->Decrypt(aesKeyList[socketID], aesKeyList[socketID].size(), encodeData);
 
          // 暗号化ヘッダーの除去したデータの作成

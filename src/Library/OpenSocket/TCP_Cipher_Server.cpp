@@ -185,13 +185,8 @@ void TCP_Cipher_Server::DataProcessing() {
 
 void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> _data) {
    if (_data.second.size() - TCP_CIPHER_HEADER_SIZE < 0) return;
-#ifdef _MSC_VER
    std::vector<char> bodyData(_data.second.size() - TCP_CIPHER_HEADER_SIZE);
-#else
-   char bodyData[_data.second.size() - TCP_CIPHER_HEADER_SIZE];
-#endif
-
-
+   if (bodyData.empty())return;
    std::memcpy(&bodyData[0], &_data.second[TCP_CIPHER_HEADER_SIZE], _data.second.size() - TCP_CIPHER_HEADER_SIZE);
 
    // 暗号化プロトコル用のパケット解析
@@ -214,7 +209,7 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
             break;
          case CIPHER_PACKET_REGISTRY_SHAREDKEY_REQUEST: {
             // 受信データより暗号化プロトコル用のヘッダーを除去しデコードのために型変換
-            std::string cipherData(&bodyData[0]);
+            std::string cipherData(bodyData.begin(), bodyData.end());
 
             // 送られてきた共通鍵をデコード
             std::string sharedKey = rsa->Decrypt(rsaKeyList[_data.first], cipherData);
@@ -238,7 +233,7 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
          } break;
          case CIPHER_PACKET_CHECK_CHECKDATA_REQUEST: {
             // 受信データの復号処理
-            std::string encodeData(&bodyData[0]);
+            std::string encodeData(bodyData.begin(), bodyData.end());
             std::string clientHashData = aes->Decrypt(aesKeyList[_data.first], aesKeyList[_data.first].size(), encodeData);
 
             // サーバ側に登録されているチェックデータをハッシュ化
@@ -262,7 +257,7 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
          } break;
          case CIPHER_PACKET_SEND_DATA:
             // データの復号処理
-            std::string encodeData(&bodyData[0]);
+            std::string encodeData(bodyData.begin(), bodyData.end());
             std::string decodeData = aes->Decrypt(aesKeyList[_data.first], aesKeyList[_data.first].size(), encodeData);
 
             // データの追加処理
