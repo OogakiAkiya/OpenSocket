@@ -185,7 +185,13 @@ void TCP_Cipher_Server::DataProcessing() {
 
 void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> _data) {
    if (_data.second.size() - TCP_CIPHER_HEADER_SIZE < 0) return;
+#ifdef _MSC_VER
+   std::vector<char> bodyData(_data.second.size() - TCP_CIPHER_HEADER_SIZE);
+#else
    char bodyData[_data.second.size() - TCP_CIPHER_HEADER_SIZE];
+#endif
+
+
    std::memcpy(&bodyData[0], &_data.second[TCP_CIPHER_HEADER_SIZE], _data.second.size() - TCP_CIPHER_HEADER_SIZE);
 
    // 暗号化プロトコル用のパケット解析
@@ -208,7 +214,7 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
             break;
          case CIPHER_PACKET_REGISTRY_SHAREDKEY_REQUEST: {
             // 受信データより暗号化プロトコル用のヘッダーを除去しデコードのために型変換
-            std::string cipherData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
+            std::string cipherData(&bodyData[0]);
 
             // 送られてきた共通鍵をデコード
             std::string sharedKey = rsa->Decrypt(rsaKeyList[_data.first], cipherData);
@@ -218,7 +224,7 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
             aesKeyList.insert({_data.first, decodeSharedKey});
 
             // 鍵登録完了の返送
-            char sendBuf[0];
+            char sendBuf[1];
             CipherSendOnlyClient(_data.first, sendBuf, sizeof(sendBuf) / sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_REGISTRIED_SHAREDKEY, PADDING_DATA, PADDING_DATA);
          } break;
          case CIPHER_PACKET_CHECK_SHAREDKEY_REQUEST: {
@@ -232,13 +238,13 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
          } break;
          case CIPHER_PACKET_CHECK_CHECKDATA_REQUEST: {
             // 受信データの復号処理
-            std::string encodeData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
+            std::string encodeData(&bodyData[0]);
             std::string clientHashData = aes->Decrypt(aesKeyList[_data.first], aesKeyList[_data.first].size(), encodeData);
 
             // サーバ側に登録されているチェックデータをハッシュ化
             std::string serverHashData = WrapperOpenSSL::createMD5Hash(checkDataList[_data.first]);
 
-            char sendBuf[0];
+            char sendBuf[1];
             if (serverHashData == clientHashData) {
                // サーバに登録されているチェックデータとクライアントから送付されたチェックデータが一致したため成功
                CipherSendOnlyClient(_data.first, sendBuf, sizeof(sendBuf) / sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_CHECK_SUCCESS, PADDING_DATA, PADDING_DATA);
@@ -256,7 +262,7 @@ void TCP_Cipher_Server::CipherProcessing(std::pair<B_SOCKET, std::vector<char>> 
          } break;
          case CIPHER_PACKET_SEND_DATA:
             // データの復号処理
-            std::string encodeData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
+            std::string encodeData(&bodyData[0]);
             std::string decodeData = aes->Decrypt(aesKeyList[_data.first], aesKeyList[_data.first].size(), encodeData);
 
             // データの追加処理

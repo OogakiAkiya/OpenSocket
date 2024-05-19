@@ -116,7 +116,11 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
    std::memcpy(&sequence, &_data.second[0], UDP_SEQUENCE_SIZE);
 
    // ボディーデータ取得
+#ifdef _MSC_VER
+   std::vector<char> bodyData(_data.second.size() - UDP_SEQUENCE_SIZE - UDP_CIPHER_HEADER_SIZE);
+#else
    char bodyData[_data.second.size() - UDP_SEQUENCE_SIZE - UDP_CIPHER_HEADER_SIZE];
+#endif
    std::memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], sizeof(bodyData) / sizeof(bodyData[0]));
 
    // UDPの擬似ソケットID作成(IPアドレス,port番号を元にIDを作成する)
@@ -141,7 +145,7 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
          break;
       case CIPHER_PACKET_REGISTRY_SHAREDKEY_REQUEST: {
          // 受信データより暗号化プロトコル用のヘッダーを除去しデコードのために型変換
-         std::string cipherData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
+         std::string cipherData(&bodyData[0]);
 
          // 送られてきた共通鍵をデコード
          std::string sharedKey = rsa->Decrypt(rsaKeyList[socketID], cipherData);
@@ -151,7 +155,7 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
          aesKeyList.insert({socketID, decodeSharedKey});
 
          // 鍵登録完了の返送
-         char sendBuf[0];
+         char sendBuf[1];
          CipherSendOnlyClient(&_data.first, sendBuf, sizeof(sendBuf) / sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_REGISTRIED_SHAREDKEY, PADDING_DATA, PADDING_DATA);
       } break;
       case CIPHER_PACKET_CHECK_SHAREDKEY_REQUEST: {
@@ -165,13 +169,13 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
       } break;
       case CIPHER_PACKET_CHECK_CHECKDATA_REQUEST: {
          // 受信データの復号処理
-         std::string encodeData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
+         std::string encodeData(&bodyData[0]);
          std::string clientHashData = aes->Decrypt(aesKeyList[socketID], aesKeyList[socketID].size(), encodeData);
 
          // サーバ側に登録されているチェックデータをハッシュ化
          std::string serverHashData = WrapperOpenSSL::createMD5Hash(checkDataList[socketID]);
 
-         char sendBuf[0];
+         char sendBuf[1];
          if (serverHashData == clientHashData) {
             // サーバに登録されているチェックデータとクライアントから送付されたチェックデータが一致したため成功
             CipherSendOnlyClient(&_data.first, sendBuf, sizeof(sendBuf) / sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_CHECK_SUCCESS, PADDING_DATA, PADDING_DATA);
@@ -189,7 +193,7 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
       } break;
       case CIPHER_PACKET_SEND_DATA:
          // データの復号処理
-         std::string encodeData(bodyData, sizeof(bodyData) / sizeof(bodyData[0]));
+         std::string encodeData(&bodyData[0]);
          std::string decodeData = aes->Decrypt(aesKeyList[socketID], aesKeyList[socketID].size(), encodeData);
 
          // 暗号化ヘッダーの除去したデータの作成
@@ -205,9 +209,10 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
 }
 
 std::string UDP_Cipher_Server::GetUDPSocketID(const B_ADDRESS_IN* _addr) {
-   std::string ipAddress = inet_ntoa(_addr->sin_addr);  // IPv4アドレスを文字列に変換
-   uint16_t port = ntohs(_addr->sin_port);              // ポート番号をホストバイトオーダーに変換
+    char ipAddr[INET_ADDRSTRLEN];
+   inet_ntop(AF_INET, &(_addr->sin_addr), ipAddr, INET_ADDRSTRLEN);  // IPv4アドレスを文字列に変換
+   uint16_t port = ntohs(_addr->sin_port);                          // ポート番号をホストバイトオーダーに変換
 
-   return ipAddress + ":" + std::to_string(port);
+   return std::string(ipAddr) + ":" + std::to_string(port);
 }
 }  // namespace OpenSocket
