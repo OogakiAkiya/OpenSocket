@@ -127,8 +127,8 @@ void UDP_Cipher_Client::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
 
    // ボディーデータ作成
    std::vector<char> bodyData(_data.second.size() - UDP_SEQUENCE_SIZE - UDP_CIPHER_HEADER_SIZE);
-   if (bodyData.empty())return;
-   std::memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], sizeof(bodyData) / sizeof(bodyData[0]));
+   if (bodyData.empty()) return;
+   std::memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], bodyData.size());
    // 暗号化ヘッダーの第二セグメントを参照し分岐処理
    switch (_data.second[UDP_SEQUENCE_SIZE + sizeof(CIPHER_PACKET)]) {
       case CIPHER_PACKET_SEND_PUBLICKEY: {
@@ -148,7 +148,7 @@ void UDP_Cipher_Client::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
       case CIPHER_PACKET_REGISTRIED_SHAREDKEY:
          // 鍵登録が無事できたかのチェックを要求
          char sendBuf[1];
-         CipherSendServer(sendBuf, sizeof(sendBuf)/sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_CHECK_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
+         CipherSendServer(sendBuf, sizeof(sendBuf) / sizeof(sendBuf[0]), CIPHER_PACKET, CIPHER_PACKET_CHECK_SHAREDKEY_REQUEST, PADDING_DATA, PADDING_DATA);
          break;
 
       case CIPHER_PACKET_SEND_CHECKDATA: {

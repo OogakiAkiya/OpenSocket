@@ -117,8 +117,8 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
 
    // ボディーデータ取得
    std::vector<char> bodyData(_data.second.size() - UDP_SEQUENCE_SIZE - UDP_CIPHER_HEADER_SIZE);
-   if (bodyData.empty())return;
-   std::memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], sizeof(bodyData) / sizeof(bodyData[0]));
+   if (bodyData.empty()) return;
+   std::memcpy(&bodyData[0], &_data.second[UDP_SEQUENCE_SIZE + UDP_CIPHER_HEADER_SIZE], bodyData.size());
 
    // UDPの擬似ソケットID作成(IPアドレス,port番号を元にIDを作成する)
    std::string socketID = GetUDPSocketID(&_data.first);
@@ -206,9 +206,9 @@ void UDP_Cipher_Server::CipherProcessing(std::pair<B_ADDRESS_IN, std::vector<cha
 }
 
 std::string UDP_Cipher_Server::GetUDPSocketID(const B_ADDRESS_IN* _addr) {
-    char ipAddr[INET_ADDRSTRLEN];
+   char ipAddr[INET_ADDRSTRLEN];
    inet_ntop(AF_INET, &(_addr->sin_addr), ipAddr, INET_ADDRSTRLEN);  // IPv4アドレスを文字列に変換
-   uint16_t port = ntohs(_addr->sin_port);                          // ポート番号をホストバイトオーダーに変換
+   uint16_t port = ntohs(_addr->sin_port);                           // ポート番号をホストバイトオーダーに変換
 
    return std::string(ipAddr) + ":" + std::to_string(port);
 }
