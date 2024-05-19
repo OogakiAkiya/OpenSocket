@@ -62,20 +62,20 @@ if(OPENSSL_FOUND)
 		add_executable(${FILE}.out  ${PROJECT_SOURCE_DIR}/src/sample/${FILE}.cpp)
 		target_link_libraries(${FILE}.out PRIVATE OpenSocket WrapperOpenSSL)
 	endforeach()
-
-	else()
-	
-	# ライブラリの追加
-	add_subdirectory(src/Library/OpenSocket)
-
-	#メイン実行ファイルの設定
-	add_executable(main.out  ${PROJECT_SOURCE_DIR}/src/main.cpp)
-	target_link_libraries(main.out PRIVATE OpenSocket)
-
-	# 非暗号化サンプル実行ファイルの設定
-	foreach(FILE ${SAMPLE_FILES})
-		add_executable(${FILE}.out  ${PROJECT_SOURCE_DIR}/src/sample/${FILE}.cpp)
-		target_link_libraries(${FILE}.out PRIVATE OpenSocket)
-	endforeach()
+	return()
 endif()
 
+#OpenSocketライブラリ単体でのビルド
+
+# ライブラリの追加
+add_subdirectory(src/Library/OpenSocket)
+
+#メイン実行ファイルの設定
+add_executable(main.out  ${PROJECT_SOURCE_DIR}/src/main.cpp)
+target_link_libraries(main.out PRIVATE OpenSocket)
+
+# 非暗号化サンプル実行ファイルの設定
+foreach(FILE ${SAMPLE_FILES})
+	add_executable(${FILE}.out  ${PROJECT_SOURCE_DIR}/src/sample/${FILE}.cpp)
+	target_link_libraries(${FILE}.out PRIVATE OpenSocket)
+endforeach()

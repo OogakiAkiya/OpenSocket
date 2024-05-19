@@ -27,7 +27,11 @@ std::string createMD5Hash(const std::string _data) {
 
    // バイナリデータを16進のデータへ変換
    decodeHash.resize(hashSize * 2);
+#ifdef _MSC_VER
+   for (unsigned int i = 0; i < hashSize; ++i) sprintf_s(&decodeHash[i * 2], decodeHash.size() - i * 2 + 1, "%02x", hashValue[i]);
+#else
    for (unsigned int i = 0; i < hashSize; ++i) std::sprintf(&decodeHash[i * 2], "%02x", hashValue[i]);
+#endif
 
    return decodeHash;
 }
